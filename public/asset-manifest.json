@@ -1,0 +1,30 @@
+{
+  "verifiedOn": "2026-11-27",
+  "assets": [
+    {
+      "file": "textures/earth.jpg",
+      "sha256": "f55226d46d27e05511f2118dc6aa24f5dbf9b6b2cddc87cc6e0e7dd067c00b11",
+      "bytes": 1617810,
+      "title": "Blue Marble Next Generation, July 2004",
+      "credit": "NASA Earth Observatory / Reto Stöckli",
+      "source": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/",
+      "download": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/july/world.200407.3x5400x2700.jpg",
+      "usage": "NASA educational/informational media usage permission; no endorsement implied",
+      "terms": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "modifications": "Unmodified downloaded JPEG; mapped to a rotating sphere in the application."
+    },
+    {
+      "file": "textures/moon.jpg",
+      "sha256": "b246064f217f8d479df78c49c7c8595a8f5fbda008a72fd539978d2e121e0109",
+      "bytes": 139068,
+      "title": "CGI Moon Kit, 2019 color map, lroc_color_poles_1k.jpg",
+      "credit": "NASA / GSFC / Arizona State University; visualization by Ernie Wright",
+      "source": "https://svs.gsfc.nasa.gov/4720/",
+      "originalDownload": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_1k.jpg",
+      "download": "https://raw.githubusercontent.com/williamjo-utaustin/falcon9-lunar-impact-simulations/main/lroc_color_poles_1k.jpg",
+      "usage": "NASA SVS public-domain visualization, educational/informational use; retain credit",
+      "terms": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "modifications": "Unmodified mirrored JPEG. NASA endpoint returned HTTP 403; downloaded the same named map from a lunar-impact research repository. Official origin and published dimensions verified; byte identity to blocked original cannot be independently confirmed."
+    }
+  ]
+}

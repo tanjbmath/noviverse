@@ -1,0 +1,18 @@
+# Science review
+
+Reviewed 27 November 2026. Child-facing explanations are original paraphrases of the primary sources below. Each playable discovery links to its relevant sources in the interface. This is a source review, not an independent expert peer review.
+
+| Content | Evidence and interpretation |
+| --- | --- |
+| Tycho name, diameter and location | [USGS / IAU Gazetteer, feature 6163](https://planetarynames.wr.usgs.gov/Feature/6163). Default control network: diameter 85.29 km, latitude −43.30°, longitude −11.22°. The record also offers an alternate network with slightly different values. |
+| Tycho A name and location | [USGS / IAU Gazetteer, feature 13551](https://planetarynames.wr.usgs.gov/Feature/13551): 28.96 km, −39.94°, −12.07°. It is a satellite *feature name*, not a separate orbiting body. |
+| Crater formation, terraces, central rebound and Tycho age | [NASA, lunar craters](https://science.nasa.gov/moon/lunar-craters/): impact excavation, collapse/terraces and central peaks; approximately 110 million years for Tycho. We do not infer an impactor size or velocity for this specific crater. |
+| Breccias and anorthosite | [Lunar and Planetary Institute, Apollo 16 samples](https://www.lpi.usra.edu/lunar/missions/apollo/apollo_16/samples/) and [NASA ARES sample education](https://ares.jsc.nasa.gov/interaction/lmdp/lunarsampleset.cfm). Breccias contain older fragments; plagioclase-rich anorthosite is associated with highland crust and magma-ocean differentiation. These representative artwork boulders have no claimed measured composition or real sample number. |
+| Lunar gravity | [NASA Glenn, Moon](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/moon/): 1.62 m/s², about one-sixth Earth gravity. Earth uses a rounded representative 9.81 m/s²; actual acceleration varies with location and altitude. |
+| Equal free fall in vacuum | [NASA, Apollo 15 hammer-feather drop](https://science.nasa.gov/resource/the-apollo-15-hammer-feather-drop/). The experiment applies the elementary constant-acceleration relation `h = ½gt²` to objects starting at rest. Equal masses are not required. Earth air resistance is deliberately excluded rather than silently compared with lunar vacuum. |
+| Impact activity | [NASA's crater explanation](https://science.nasa.gov/moon/lunar-craters/) supports impact formation. The elementary kinetic-energy relation `½mv²` shows squared velocity dependence; energies in the activity are 12.5, 50, and 200 GJ for a 1,000 kg body at 5, 10, and 20 km/s. Drawn crater radius is qualitative artwork, not a calculated physical result. |
+| Earth intro | [NASA, Earth facts](https://science.nasa.gov/earth/facts/): approximately 71% ocean surface and approximately eight-minute sunlight travel. |
+| Sun intro | [NASA, Sun facts](https://science.nasa.gov/sun/facts/): fusion of hydrogen into helium; approximately 15 million °C core; no solid surface and a visible photosphere. |
+| Lunar environment / fictional craft | [NASA, Moon facts](https://science.nasa.gov/moon/facts/): rocky surface and very thin exosphere. Downward rocket thrust can operate in vacuum; Novi's compact transforming craft, instant scanner and travel times are fictional. |
+
+Keep new content in local data modules with a primary source, a checked date, and explicit model limitations. Do not present decorative local coordinates or procedural rock appearance as measured lunar observations.
