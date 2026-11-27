@@ -106,16 +106,20 @@ export function createNovi() {
   ball(scanner, 'pearl', [0, 0.26, 0], [0.15, 0.1, 0.12]);
   ball(scanner, 'glow', [0, 0.26, 0.11], [0.08, 0.06, 0.03]);
   const scanRing = ring(root, 'glow', [0, -0.4, 0], 1.1, 0.013, Math.PI / 2); scanRing.visible = false;
-  let mode = 0, moving = false, scanning = false;
+  let mode = 0, moving = false, scanning = false, idleBlend = 1;
   return {
     root,
     setTransform(t) { mode = t; pods.forEach(p => { p.rotation.x = -t * Math.PI / 2; }); fins.forEach((f, i) => { f.rotation.y = (i ? 1 : -1) * t * 0.35; }); },
     setMoving(value) { moving = value; },
     setScanning(value) { scanning = value; scanRing.visible = value; },
-    update(time, reduced = false) {
+    update(time, reduced = false, dt = 1 / 60) {
       const animate = !reduced;
-      hull.position.y = animate ? Math.sin(time * 1.5) * 0.035 : 0;
-      hull.rotation.z = animate ? Math.sin(time * 0.8) * (moving ? 0.07 : 0.022) : 0;
+      // Animate the local hull so cinematic navigation keeps ownership of the root.
+      idleBlend += ((!moving && mode === 0 ? 1 : 0) - idleBlend) * (1 - Math.exp(-5 * dt));
+      hull.position.y = animate ? Math.sin(time * 1.5) * (0.035 + idleBlend * 0.185) : 0;
+      hull.position.x = animate ? Math.sin(time * 0.7) * idleBlend * 0.045 : 0;
+      hull.rotation.x = animate ? Math.sin(time * 0.6) * idleBlend * 0.018 : 0;
+      hull.rotation.z = animate ? Math.sin(time * 0.8) * (moving ? 0.07 : 0.022 + idleBlend * 0.018) : 0;
       head.rotation.y = scanning ? Math.sin(time * 2) * 0.22 : animate ? Math.sin(time * 0.7) * 0.12 : 0;
       eyes.scale.y = animate && Math.sin(time * 1.1) > 0.993 ? 0.1 : 1;
       flames.forEach((f, i) => { f.scale.y = (moving ? 1.6 : mode ? 0.6 : 0.4) + (animate ? Math.sin(time * 12 + i) * 0.1 : 0); });

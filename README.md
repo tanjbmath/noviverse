@@ -28,7 +28,7 @@ npm run preview
 
 ## Playable scope
 
-- Rotating NASA-textured Earth, visible textured Moon, stylized Sun, starfield, atmospheric rim lighting, and an original articulated 3D Novi spacecraft.
+- Rotating NASA-textured Earth, a textured Moon slowly orbiting Earth, stylized Sun, starfield, atmospheric rim lighting, and an original articulated 3D Novi spacecraft with a visible idle hover and gentle sway. The Moon completes an artistic orbit in 150 seconds; its position locks during navigation. Reduce Motion freezes ambient movement.
 - Click/tap destinations, cinematic automatic flight, descent, continuous engine-pod and wing transformation into lunar hover mode, automatic approaches and scanning, Back and Home.
 - A localized artistic Tycho-region diorama with selectable **Tycho** and **Tycho A**, terraced crater terrain, central peak, scattered instanced debris, representative breccia and anorthosite boulders, and a fictional gravity-lab instrument.
 - Each discovery has an explanation, fact, optional deeper text, and primary-source links. No progression gates or collection requirements.

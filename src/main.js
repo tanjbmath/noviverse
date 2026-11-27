@@ -27,7 +27,7 @@ const duration = seconds => reduced ? 0.08 : seconds;
 function begin(text) {
   operation.abort(); operation = new AbortController(); busy = true;
   ui.closeModal(); ui.hideDiscovery(); ui.setBusy(true, text);
-  if (world) world.novi.setScanning(false);
+  if (world) { world.novi.setScanning(false); world.setIdle?.(false); }
   return operation.signal;
 }
 function settle() { busy = false; ui.setBusy(false); world?.novi.setMoving(false); }
@@ -46,7 +46,7 @@ async function home(initial = false) {
   const signal = begin(initial ? 'Preparing a universe of discoveries…' : 'Heading home to our blue planet…');
   try {
     if (world?.kind === 'space') {
-      world.resize(engine); world.novi.root.rotation.set(0.06, -0.33, -0.08);
+      world.setIdle(true); world.resize(engine); world.novi.root.rotation.set(0.06, -0.33, -0.08);
       ui.world('space', world.labels); settle(); return;
     }
     // Start the lazy module/assets while the ascent plays. Result wrappers prevent unhandled rejections.

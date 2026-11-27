@@ -100,7 +100,7 @@ export async function createMoon(engine) {
     },
     resize(engine) { if (!this.visiting) this.overview(engine); },
     update(dt, time, engine) {
-      novi.update(time, engine.paused);
+      novi.update(time, engine.paused, dt);
       beacons.forEach((b, i) => { b.children[0].scale.setScalar(1 + (engine.paused ? 0 : Math.sin(time * 2 + i) * 0.13)); });
     },
   };
