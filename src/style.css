@@ -34,6 +34,6 @@ body[data-world=earth] .vignette{background:linear-gradient(0deg,#06141f,transpa
 .earth-controls button{min-width:44px;min-height:44px;border-radius:8px;background:#173447;color:#d8f7eb;font-size:.875rem;padding:7px 10px}
 .earth-controls button:last-child{min-width:88px}
 .discovering .earth-controls,.travelling .earth-controls{display:none}
-@media(max-width:759px){.earth-controls{left:15px;right:15px;bottom:60px;max-width:none;justify-content:center;gap:3px;padding:6px}.earth-controls button{padding:6px;flex:1}.earth-controls button:last-child{min-width:76px}.earth-intro p:last-child{font-size:.875rem}}
+@media(max-width:759px){.earth-controls{left:15px;right:15px;bottom:60px;max-width:none;justify-content:center;gap:1px;padding:4px}.earth-controls button{padding:4px 2px;flex:1}.earth-controls button:last-child{min-width:44px}.earth-intro p:last-child{font-size:.875rem}}
 
 @media(min-width:760px) and (max-height:499px){.earth-controls{left:28px;right:auto}.earth-intro h1{font-size:32px}.earth-intro .text-button{margin-bottom:8px}.earth-intro p:last-child{font-size:.875rem}}

@@ -73,13 +73,17 @@ test('Earth navigation is expandable, cancellable and releases gesture listeners
   globalThis.innerWidth=390;globalThis.innerHeight=844;
   const surface=new Surface(),engine={renderer:{domElement:surface},camera:new THREE.PerspectiveCamera(43,390/844,.1,1200),look:new THREE.Vector3(),paused:false,
     async animate(seconds,draw,signal){if(signal?.aborted)return false;draw(1);return true;}};
-  const world=await createEarth(engine,{map:new THREE.Texture()}); world.activate(); world.resize(engine); world.setInteractive(true);
+  const originalCamera=engine.camera.position.clone(),originalLook=engine.look.clone();
+  const world=await createEarth(engine,{map:new THREE.Texture()});
+  assert(engine.camera.position.equals(originalCamera),'a pending Earth load must not move the active camera');assert(engine.look.equals(originalLook));
+  world.activate(); world.resize(engine); world.setInteractive(true);
   assert.deepEqual(world.labels.map(l=>l.id),['asia']);
   assert(await world.focus('asia',engine,0));assert.equal(world.region,'asia');assert.equal(world.labels.length,3);
   assert(await world.focus('merapi',engine,0));assert.equal(world.visiting,true);
   world.setInteractive(true);assert.equal(world.controls.enabled,false);
   assert(await world.focus('asia',engine,0));assert.equal(world.visiting,false);
-  const aborted=new AbortController();aborted.abort();assert.equal(await world.focus('globe',engine,0,aborted.signal),false);
+  const originalRegion=world.region,originalPose={...world.controls.pose};
+  const aborted=new AbortController();aborted.abort();assert.equal(await world.focus('globe',engine,0,aborted.signal),false);assert.equal(world.region,originalRegion);assert.deepEqual(world.controls.pose,originalPose);
   const root=world.novi.root.position.clone();world.update(0,10,{paused:true});assert(world.novi.root.position.equals(root));
-  world.deactivate();disposeScene(world.scene);assert.equal(world.scene.children.length,0);assert([...surface.handlers.values()].every(set=>set.size===0));
+  world.deactivate();const exitedCamera=engine.camera.position.clone();world.controls.setPose({lon:40});assert(engine.camera.position.equals(exitedCamera),'inactive controls must not own the camera');disposeScene(world.scene);assert.equal(world.scene.children.length,0);assert([...surface.handlers.values()].every(set=>set.size===0));
 });

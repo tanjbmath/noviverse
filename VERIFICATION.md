@@ -97,3 +97,6 @@ Validation ran on GitHub Actions because the local execution workspace was unava
 - This phase adds globe-based science introductions. Walking terrain, rainforest/volcano environments, underground cutaways, other continent discoveries and new Earth mini-games remain future work. Broad-region coordinates are representative, not surveyed boundaries; Merapi uses the catalog location. Imagery is historical rather than live.
 
 A temporary workflow used for feature-branch validation/packaging was removed before merge. The existing production deployment configuration is preserved.
+
+
+Final follow-up: Earth scene construction and inactive controls cannot move the active camera. An already-aborted focus leaves the current region and pose intact. These cases were added to the scene-navigation check. Phone globe controls keep a single row of 44 px buttons at the tested 360/390 px widths. [Final validation/build run](https://github.com/tanjbmath/noviverse/actions/runs/45994068298) passed all 17 tests, asset verification and production build/root/dist checks for source commit ae1dc1ae2072834d84c790f38871602e19857fcc. The same browser/hardware verification limits apply.
