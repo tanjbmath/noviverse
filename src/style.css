@@ -37,3 +37,19 @@ body[data-world=earth] .vignette{background:linear-gradient(0deg,#06141f,transpa
 @media(max-width:759px){.earth-controls{left:15px;right:15px;bottom:60px;max-width:none;justify-content:center;gap:1px;padding:4px}.earth-controls button{padding:4px 2px;flex:1}.earth-controls button:last-child{min-width:44px}.earth-intro p:last-child{font-size:.875rem}}
 
 @media(min-width:760px) and (max-height:499px){.earth-controls{left:28px;right:auto}.earth-intro h1{font-size:32px}.earth-intro .text-button{margin-bottom:8px}.earth-intro p:last-child{font-size:.875rem}}
+
+body[data-world=wonder]{--mint:#c0f2d5}
+body[data-world=wonder] .vignette{background:linear-gradient(90deg,#06131c80,transparent 30%),linear-gradient(0deg,#071724,transparent 17%)}
+.wonder-intro{max-width:330px;top:105px}
+.wonder-intro h1{font-size:30px;letter-spacing:-1px;text-shadow:0 2px 16px #000}
+.wonder-intro .text-button{margin-bottom:8px}
+.wonder-intro p:last-of-type{font-size:.875rem;text-shadow:0 2px 8px #000;margin:10px 0 16px;color:#fff}
+.wonder-intro .primary{font-size:.875rem;padding:10px 14px;pointer-events:auto}
+.discovering .wonder-intro{display:none}
+.wonder-challenge-art{position:relative;border-radius:14px;overflow:hidden;margin:18px 0;border:1px solid var(--line)}
+.wonder-challenge-art img{display:block;width:100%;height:auto}
+.wonder-challenge-art .explore-node{transform:translate(-50%,-50%);clip-path:circle(50%);background:#0b23324d}
+.wonder-challenge-art .found{background:#c5ffe255;box-shadow:0 0 15px #fff}
+.wonder-challenge-art .found .target-dot{background:#ffe4a0}
+@media(max-width:759px){.wonder-intro{top:84px;left:22px;right:22px;max-width:none}.wonder-intro h1{font-size:24px;line-height:1.2}.wonder-intro .text-button{margin:0 0 2px}.wonder-intro p:last-of-type{display:none}.wonder-intro .primary{margin-top:9px;font-size:.8125rem;padding:8px 12px;min-height:44px}}
+@media(min-width:760px) and (max-height:499px){.wonder-intro{top:95px;max-width:260px}.wonder-intro h1{font-size:24px}.wonder-intro p:last-of-type{display:none}.wonder-intro .primary{margin-top:10px}}

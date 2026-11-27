@@ -35,7 +35,7 @@ npm run preview
 - An ideal gravity experiment with two different masses on both worlds; tap plus/minus to set 1–20 m drop height, then compare timed drops.
 - An impact-energy experiment with 5, 10, and 20 km/s choices, calculated kinetic energy, and a deliberately qualitative crater animation.
 - A solar observatory reached by tapping the Sun: animated granular plasma, dark sunspot groups, luminous prominence strands, and a streaming corona. Four unlabeled nodes reveal NASA-linked science about the photosphere, sunspots, prominences and corona, with a replayable three-question Sun detective activity. Novi remains a spacecraft; there is no solar landing.
-- Tapping Earth opens a turnable NASA-textured globe with all seven continents visible. Drag/swipe or scroll to turn; pinch or Shift/Ctrl-scroll to zoom. Accessible turn/zoom/reset buttons provide a pointer-independent alternative. The first available continent is Asia, with geographically anchored Merapi, Himalayas and Borneo science stops. Back returns from a stop to Asia, then to the globe; Home returns to space. Walking environments and underground exploration remain future work.
+- Tapping Earth opens a turnable NASA-textured globe with all seven continents visible. Drag/swipe or scroll to turn; pinch or Shift/Ctrl-scroll to zoom. Accessible turn/zoom/reset buttons provide a pointer-independent alternative. The first available continent is Asia, with geographically anchored Merapi, Himalayas and Borneo science stops. Back returns from a stop to Asia, then to the globe; Home returns to space. Tapping a location zooms into an illustrated scenic close-up. Novi folds the spacecraft and deploys a walking field-explorer form; three feature nodes per location open closer views and source-linked details. Each location has a three-clue picture challenge. Underground exploration remains future work.
 - Responsive 390 px phone and desktop layouts, unlabeled glowing HTML nodes for all raycast targets, with 44 px touch areas, native modal focus management, accessible names, and a Reduce Motion toggle. System reduced-motion preference is respected on initial load. Keyboard activation of buttons works; there are no keyboard movement controls.
 
 ## Structure
@@ -54,6 +54,9 @@ src/scenes/space.js         Space scene and responsive planet composition
 src/scenes/moon.js          On-demand lunar diorama and POIs
 src/scenes/sun.js           On-demand solar observatory and responsive discovery views
 src/scenes/earth.js         On-demand globe, geographic nodes and continent/site views
+src/scenes/wonder.js        Illustrated close-ups with 3D Novi and feature camera views
+src/data/wonders.js         Art anchors, feature science and location challenge clues
+src/ui/wonder-activity.js   Picture-based discovery challenges
 src/data/earth.js           Expandable continent and location registry
 src/scenes/shared.js        Starfield, atmosphere and beacons
 src/data/discoveries.js     Source-linked science records and POI definitions
@@ -72,6 +75,8 @@ The Moon scene is dynamically imported at destination selection; its terrain, ro
 
 Earth expansion: enable a continent in `src/data/earth.js`, add its region and location records, then add the matching source-linked discoveries in `src/data/discoveries.js`. Names are revealed after selection; rear-side nodes are hidden and blocked by the globe. Broad-region anchors are representative; Merapi uses Smithsonian coordinates. Geography is aligned to the existing equirectangular map, with no political boundary layer or live land-cover claim.
 
+Earth close-ups use separately generated scenic illustrations with a volumetric animated Novi character (2.5D), not surveyed or fully modeled terrain. Art anchors identify depicted features; there is no collision or free-roaming simulation. Return from a detail to the lookout, then to the continent; Home always returns to space. The three scenic images and their original prompts are recorded in `docs/wonder-art-prompts.md`.
+
 To add a discovery, create a source-linked data record and add a target mesh and node anchor in its scene. Nodes keep accessible names for screen readers; visible names and facts appear after selection. To add a world, give it the scene contract used by `createSpace`/`createMoon`: `scene`, `kind`, `novi`, `targets`, `labels`, `resize`, and `update`; import it on demand in navigation.
 
 ## Scientific and visual boundaries
@@ -86,6 +91,6 @@ See [SCIENCE.md](SCIENCE.md) and [ASSET_LICENSES.md](ASSET_LICENSES.md) for revi
 
 ## Performance limits
 
-WebGL2 is required. Pixel ratio is capped at 1.75; debris is instanced; no physics engine, postprocessing stack, web fonts, audio downloads, or backend is needed. Current imagery totals about 1.76 MB. Three.js is a separate ~541 KB minified / ~141 KB gzip chunk, which triggers Vite's default 500 KB advisory. Scene and experiment code are split independently. Further model batching, compressed texture formats, lower GPU tiers, and physical-device profiling would be worthwhile before a broad mobile release.
+WebGL2 is required. Pixel ratio is capped at 1.75; debris is instanced; no physics engine, postprocessing stack, web fonts, audio downloads, or backend is needed. Base Earth/Moon imagery totals about 1.76 MB. Wonder artwork is loaded only when its location is selected (about 0.49–0.59 MB per location; about 1.66 MB across all three). Three.js is a separate ~541 KB minified / ~141 KB gzip chunk, which triggers Vite's default 500 KB advisory. Scene and experiment code are split independently. Further model batching, compressed texture formats, lower GPU tiers, and physical-device profiling would be worthwhile before a broad mobile release.
 
 Errors loading scenes and WebGL context loss show a reload/recovery dialog. Full offline use after an ordinary browser reload is not guaranteed: there is no service worker or installed PWA. A static host or local server is needed. No state persists between visits.
