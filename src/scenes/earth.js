@@ -48,7 +48,9 @@ export async function createEarth(engine, options = {}) {
     pick.position.copy(object.position); pick.userData.poi = data.id; scene.add(pick);
     anchors[data.id] = { id: data.id, text: data.name || data.title, object, pick, offset: new THREE.Vector3(), visible: e => anchorVisible(object.position, e.camera.position) };
   }
-  const controls = new GlobeControls(() => world.applyView(engine));
+  // Construction can finish after an interrupted trip. Only the active scene owns the camera.
+  let active = false;
+  const controls = new GlobeControls(() => { if (active) world.applyView(engine); });
   const world = {
     kind: 'earth', scene, globe, novi, controls, region: null, visiting: false, labels: [], targets: [],
     setLevel(region) {
@@ -58,8 +60,8 @@ export async function createEarth(engine, options = {}) {
       this.targets = [globe, ...this.labels.map(label => label.pick)];
     },
     setInteractive(value) { controls.setEnabled(value && !this.visiting); },
-    activate() { controls.attach(engine.renderer.domElement); },
-    deactivate() { controls.dispose(); },
+    activate() { active = true; controls.attach(engine.renderer.domElement); this.applyView(engine); },
+    deactivate() { active = false; controls.dispose(); },
     applyView(e, width = innerWidth, height = innerHeight) {
       const view = globeFrame(controls.pose, width, height, this.visiting);
       e.camera.position.copy(view.position); e.look.copy(view.look);
@@ -73,6 +75,7 @@ export async function createEarth(engine, options = {}) {
       this.applyView(e, width, height); novi.root.scale.setScalar(width < 760 ? .34 : .48);
     },
     async focus(id, e, seconds, signal) {
+      if (signal?.aborted) return false;
       const site = earthSites[id], region = earthRegions[id];
       const goal = site || region || globePose;
       this.visiting = !!site;
