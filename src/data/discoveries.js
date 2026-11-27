@@ -73,9 +73,42 @@ export const discoveries = {
     stats: [['~15 million °C', 'core temperature'], ['Hydrogen', 'main ingredient']],
     explanation: 'Deep inside the Sun, nuclear fusion turns hydrogen into helium and releases energy. That energy eventually reaches space as light and other radiation. The Sun is a star, not a burning campfire.',
     fact: 'The Sun has no solid ground to land on. Its visible “surface” is a layer called the photosphere.',
-    detail: 'Future expansion: sunspots, magnetic activity, and solar wind. Novi observes from a fictional safe viewing position. The illustration is not a safe real spacecraft design. Never look directly at the real Sun.',
+    detail: 'Novi observes from a fictional viewing position. The illustration is not a safe real spacecraft design. Never look directly at the real Sun.',
     sourceIds: ['sun'],
+  },
+  photosphere: {
+    title: 'The photosphere', category: 'A SURFACE YOU CANNOT STAND ON', icon: 'sun',
+    stats: [['~5,500 °C', 'visible surface'], ['Plasma', 'hot charged gas']],
+    explanation: 'This glowing layer sends most of the Sun’s visible light into space. It looks like a surface, but there is no solid ground. The Sun is a huge ball of hot gas and electrically charged gas called plasma.',
+    fact: 'The Sun shines because nuclear fusion deep in its core turns hydrogen into helium and releases energy. It does not need oxygen like a campfire.',
+    detail: 'The core is about 15 million °C, much hotter than the photosphere. Hot material rises and cooler material sinks beneath the visible surface. The moving texture is an artistic illustration of solar granulation; its colors, scale and speed are exaggerated.',
+    activity: 'solar', activityTitle: 'Be a Sun detective', sourceIds: ['sun'],
+  },
+  sunspots: {
+    title: 'Sunspots', category: 'DARKER DOES NOT MEAN COLD', icon: 'sun',
+    stats: [['Magnetism', 'what shapes them'], ['Still hot', 'despite the color']],
+    explanation: 'These darker patches are cooler than the bright photosphere around them. Strong magnetic fields interfere with the motion that carries heat upward. A dark center and lighter surrounding region make a sunspot stand out.',
+    fact: 'Sunspots are not holes in the Sun. Even a cooler sunspot is extremely hot!',
+    detail: 'Real sunspots change and can last from days to months. The patches here are invented examples, not the Sun’s current activity. Their size and contrast are chosen to make them easy to explore.',
+    activity: 'solar', activityTitle: 'Be a Sun detective', sourceIds: ['sun'],
+  },
+  prominence: {
+    title: 'A solar prominence', category: 'PLASMA HELD UP BY MAGNETISM', icon: 'sun',
+    stats: [['Plasma', 'loop material'], ['Magnetic fields', 'support it']],
+    explanation: 'A prominence is a large structure of solar material held above the Sun by magnetic fields. Seen at the edge of the Sun, it can look like a glowing arch. Its material is cooler and denser than the surrounding corona.',
+    fact: 'Seen against the bright face of the Sun, the same kind of structure is called a filament and can appear dark.',
+    detail: 'A prominence is not the same thing as a solar flare. A flare is a sudden release of magnetic energy; a prominence is a structure of plasma. Some prominences erupt. The arches here illustrate the idea and do not predict real solar weather.',
+    activity: 'solar', activityTitle: 'Be a Sun detective', sourceIds: ['sun'],
+  },
+  corona: {
+    title: 'The solar corona', category: 'THE SUN’S SURPRISINGLY HOT CROWN', icon: 'sun',
+    stats: [['~2 million °C', 'corona (up to)'], ['Much hotter', 'than the photosphere']],
+    explanation: 'The corona is the Sun’s thin, extended outer atmosphere. It is much hotter than the visible photosphere below it. Scientists study how energy heats this enormous region.',
+    fact: 'During a total solar eclipse, the Moon blocks the bright photosphere and the faint corona becomes easier to see.',
+    detail: 'Solar wind flows outward from the corona. The orange halo and rays here are artistic ways to make this faint region visible beside the bright Sun; the glare is an illustration of light scattering in a viewing system, not a solid solar layer. Never look directly at the real Sun.',
+    activity: 'solar', activityTitle: 'Be a Sun detective', sourceIds: ['sun'],
   },
 };
 
 export const moonPoiIds = ['tycho', 'tychoA', 'breccia', 'anorthosite', 'gravity'];
+export const sunPoiIds = ['photosphere', 'sunspots', 'prominence', 'corona'];

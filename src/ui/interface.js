@@ -28,6 +28,12 @@ export class Interface {
         <h1>Hello, Moon.</h1>
         <p>Tap a glowing node.<br>Every stop has a story to discover.</p>
       </section>
+      <section class="moon-intro sun-intro" id="sun-intro" hidden>
+        <button class="text-button" data-action="home">${icon('back')} Back to space</button>
+        <p class="eyebrow">SOLAR OBSERVATORY</p>
+        <h1>Hello, Sun.</h1>
+        <p>A star full of surprises.<br>Tap a node. Let’s look closer.</p>
+      </section>
       <div id="labels" class="labels" aria-label="Objects to explore"></div>
       <aside class="novi-message" id="novi-message"><span class="mini-face" aria-hidden="true"><i></i><i></i></span><p><strong>Your co-pilot, Novi</strong><span>Small explorer. Endless questions.</span></p></aside>
       <aside id="discovery" class="discovery" aria-label="Science discovery" hidden></aside>
@@ -67,9 +73,10 @@ export class Interface {
     document.body.dataset.world = kind;
     this.elements['space-intro'].hidden = kind !== 'space';
     this.elements['moon-intro'].hidden = kind !== 'moon';
+    this.elements['sun-intro'].hidden = kind !== 'sun';
     this.elements['novi-message'].hidden = kind !== 'space';
-    this.elements['location-chip'].textContent = kind === 'space' ? 'SPACE EXPLORER' : 'MOON · TYCHO REGION';
-    this.elements['field-note'].innerHTML = kind === 'space' ? 'A playful universe. Real science. <span>Sizes & distances are not to scale.</span>' : 'Artistic Tycho diorama · Novi’s hovercraft is fictional. <span>Geography & travel compressed. Rocks are representative.</span>';
+    this.elements['location-chip'].textContent = kind === 'space' ? 'SPACE EXPLORER' : kind === 'sun' ? 'SUN · SOLAR OBSERVATORY' : 'MOON · TYCHO REGION';
+    this.elements['field-note'].innerHTML = kind === 'space' ? 'A playful universe. Real science. <span>Sizes & distances are not to scale.</span>' : kind === 'sun' ? 'Illustrated solar view · Colors & activity are artistic. <span>Novi’s viewing position is fictional. Never look directly at the real Sun.</span>' : 'Artistic Tycho diorama · Novi’s hovercraft is fictional. <span>Geography & travel compressed. Rocks are representative.</span>';
     this.labels = labels;
     this.elements.labels.innerHTML = labels.map(label => `<button class="explore-node" aria-label="Explore ${label.text}" data-${kind === 'space' ? 'destination' : 'poi'}="${label.id}"><span class="target-dot" aria-hidden="true"></span></button>`).join('');
     this.labelButtons = [...this.elements.labels.children];
@@ -92,10 +99,10 @@ export class Interface {
       <p class="eyebrow">${d.category}</p><h2 tabindex="-1">${d.title}</h2>
       <div class="stats">${d.stats.map(([value, label]) => `<div><strong>${value}</strong><small>${label}</small></div>`).join('')}</div>
       <p>${d.explanation}</p><div class="wonder"><span>${icon('star')} DID YOU KNOW?</span><p>${d.fact}</p></div>
-      ${d.activity ? `<button class="primary activity-button" data-action="activity">${icon('lab')}${d.activityTitle}</button>` : '<span class="expansion">MORE ENVIRONMENTS · FUTURE EXPANSION</span>'}
+      ${d.activity ? `<button class="primary activity-button" data-action="activity">${icon('lab')}${d.activityTitle}</button>` : d === discoveries.earth ? '<span class="expansion">MORE ENVIRONMENTS · FUTURE EXPANSION</span>' : ''}
       <details><summary>A closer look</summary><p>${d.detail}</p></details>
       <details><summary>Science sources</summary><ul>${d.sourceIds.map(id => `<li><a href="${sources[id][1]}" target="_blank" rel="noopener noreferrer">${sources[id][0]}</a></li>`).join('')}</ul><small>Checked 27 November 2026</small></details>
-      <button class="text-button" data-action="back">${icon('back')}${this.kind === 'moon' ? 'Lunar overview' : 'Back to space'}</button>`;
+      <button class="text-button" data-action="back">${icon('back')}${this.kind === 'moon' ? 'Lunar overview' : this.kind === 'sun' ? 'Solar overview' : 'Back to space'}</button>`;
     this.elements.discovery.hidden = false;
     document.body.classList.add('discovering');
     this.elements.discovery.querySelector('h2').focus({ preventScroll: true });
@@ -122,7 +129,7 @@ export class Interface {
       <p>Tap a world or a glowing node to discover its name and science. Novi navigates automatically. Back returns to the overview; Home returns to space. All destinations are open from the beginning. Nothing is saved.</p>
       <h3>Art & imagery credits</h3><p>Earth: NASA Earth Observatory, Blue Marble Next Generation (July 2004), Reto Stöckli. Moon: NASA / GSFC / Arizona State University, LRO CGI Moon Kit, Ernie Wright. Novi, equipment, terrain and interface are original code-authored artwork.</p>
       <p><a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a> · <a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noopener noreferrer">Moon map credits</a></p>
-      <p class="muted">First playable edition · Moon loop complete. Earth and Sun offer introductory views; expanded worlds are planned. No accounts, analytics, storage, or backend services.</p>`);
+      <p class="muted">Explore the Moon and the solar observatory. Earth offers an introductory view; expanded environments are planned. Solar plasma, glare and magnetic loops are authored illustrations, not live imagery or a physical simulation. No accounts, analytics, storage, or backend services.</p>`);
   }
   error(message) {
     this.setBusy(false); this.openModal(`<p class="eyebrow">A LITTLE SPACE WEATHER</p><h2 id="modal-title">We couldn’t draw this world.</h2><p>${message}</p><p>Try reloading in a browser with WebGL2 enabled. If a texture failed to load, check that the textures folder is served with the site.</p><button class="primary" onclick="location.reload()">Try again</button><p><a href="https://science.nasa.gov/moon/">Explore Moon science at NASA</a></p>`);

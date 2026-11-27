@@ -1,5 +1,40 @@
 import { fallTime, fallDistance, GRAVITY, impactEnergy } from '../core/math.js';
 
+export const solarQuestions = [
+  { question: 'Why does a sunspot look dark?', choices: ['It is a deep hole.', 'It is cooler than its surroundings.', 'It has no light at all.'], answer: 1, explanation: 'Sunspots are still very hot. Their lower temperature makes them look darker beside the brighter photosphere.' },
+  { question: 'Which is hotter?', choices: ['The outer corona', 'The visible photosphere'], answer: 0, explanation: 'The photosphere is about 5,500 °C. The corona can reach about 2 million °C, even though it is farther from the core.' },
+  { question: 'What powers the Sun?', choices: ['Burning wood and oxygen', 'Electricity from the planets', 'Nuclear fusion in its core'], answer: 2, explanation: 'Fusion turns hydrogen into helium deep in the core and releases energy. The Sun is not a campfire.' },
+];
+
+export function solarActivity(ui) {
+  let index = 0, score = 0, answered = false;
+  ui.openModal(`<p class="eyebrow">NOVI’S MINI LAB · SUN DETECTIVE</p><h2 id="modal-title">What did you discover?</h2><div id="solar-question"></div>`);
+  const container = ui.elements.modal.querySelector('#solar-question');
+  function draw() {
+    const q = solarQuestions[index]; answered = false;
+    container.innerHTML = `<p class="muted">Question ${index + 1} of ${solarQuestions.length}</p><h3 tabindex="-1">${q.question}</h3><div class="solar-choices">${q.choices.map((text, i) => `<button class="choice" data-answer="${i}">${text}</button>`).join('')}</div><p class="experiment-result" role="status" id="solar-result">Choose your answer. Every question has a clue in the solar discoveries.</p><button class="primary wide" id="solar-next" hidden>${index === solarQuestions.length - 1 ? 'See my discoveries' : 'Next question'}</button>`;
+    if (index > 0) container.querySelector('h3').focus();
+    container.querySelectorAll('[data-answer]').forEach(button => button.addEventListener('click', () => {
+      if (answered) return; answered = true;
+      const correct = Number(button.dataset.answer) === q.answer;
+      if (correct) score++;
+      container.querySelectorAll('[data-answer]').forEach(b => { b.disabled = true; b.classList.toggle('correct-answer', Number(b.dataset.answer) === q.answer); });
+      container.querySelector('#solar-result').textContent = `${correct ? 'You found it!' : 'Another clue for your next visit:'} ${q.explanation}`;
+      container.querySelector('#solar-next').hidden = false;
+    }));
+    container.querySelector('#solar-next').addEventListener('click', () => {
+      if (!answered) return;
+      if (++index < solarQuestions.length) draw();
+      else {
+        container.innerHTML = `<h3 tabindex="-1">${score} of ${solarQuestions.length} discoveries!</h3><p>Hot sunspots, an even hotter corona, and fusion deep inside. There is always more to investigate.</p><button class="primary wide" id="solar-retry">Explore the questions again</button><p><a href="https://science.nasa.gov/sun/facts/" target="_blank" rel="noopener noreferrer">Explore the Sun with NASA</a></p>`;
+        container.querySelector('h3').focus();
+        container.querySelector('#solar-retry').addEventListener('click', () => { index = 0; score = 0; draw(); });
+      }
+    });
+  }
+  draw();
+}
+
 export function gravityActivity(ui) {
   let raf = 0, alive = true, running = false, start = 0, last = 0, elapsed = 0;
   const html = `<p class="eyebrow">NOVI’S MINI LAB · GRAVITY</p><h2 id="modal-title">Which one lands first?</h2>

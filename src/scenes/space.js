@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { loadTexture } from '../core/assets.js';
 import { createNovi } from '../models/novi.js';
 import { atmosphere, starfield } from './shared.js';
+import { createSun } from '../models/sun.js';
 
 export async function createSpace(engine) {
   const scene = new THREE.Scene(); scene.background = new THREE.Color('#070d1c'); scene.add(starfield());
@@ -11,9 +12,8 @@ export async function createSpace(engine) {
   const air = atmosphere(3.34); air.position.copy(earth.position); scene.add(air);
   const moon = new THREE.Mesh(new THREE.SphereGeometry(0.85, 48, 32), new THREE.MeshStandardMaterial({ map: moonMap, roughness: 1 }));
   moon.position.set(6.65, 2.65, -1.4); moon.rotation.y = -0.6; moon.userData.poi = 'moon'; scene.add(moon);
-  const sun = new THREE.Mesh(new THREE.SphereGeometry(0.55, 40, 24), new THREE.MeshBasicMaterial({ color: '#ffe4a3' }));
+  const solar = createSun(.55, { detail: false }), sun = solar.root;
   sun.position.set(10, 6, -5); sun.userData.poi = 'sun'; scene.add(sun);
-  for (let i = 0; i < 5; i++) { const glow = atmosphere(0.62 + i * 0.14, '#ffa353', 0.28 / (i + 1)); sun.add(glow); }
   const key = new THREE.DirectionalLight('#fff3d6', 3.2); key.position.set(-6.5, 6.5, 8); scene.add(key);
   const fill = new THREE.DirectionalLight('#78c9f9', 0.9); fill.position.set(3, 2, 12); scene.add(fill);
   scene.add(new THREE.AmbientLight('#9eafc8', 0.14));
@@ -28,7 +28,7 @@ export async function createSpace(engine) {
       { id: 'moon', text: 'The Moon', sub: 'Land & explore', object: moon, offset: new THREE.Vector3(0, -1.1, 0) },
       { id: 'sun', text: 'The Sun', sub: 'Meet our star', object: sun, offset: new THREE.Vector3(0, -0.8, 0) },
     ],
-    ...createSpaceMotion({ earth, air, moon, sun, novi, orbit }),
+    ...createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar }),
   };
 }
 
@@ -37,7 +37,7 @@ function orbitOffset(phase) {
   return new THREE.Vector3(Math.cos(phase), Math.sin(phase) * Math.cos(0.45), -Math.sin(phase) * Math.sin(0.45));
 }
 
-export function createSpaceMotion({ earth, air, moon, sun, novi, orbit }) {
+export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar }) {
   let phase = 0.65, idle = true, radius = 5.05;
   const placeMoon = () => moon.position.copy(earth.position).addScaledVector(orbitOffset(phase), radius);
   return {
@@ -69,6 +69,7 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit }) {
         if (idle) { phase = (phase + dt * Math.PI * 2 / 150) % (Math.PI * 2); placeMoon(); }
       }
       novi.update(time, engine.paused, dt);
+      solar?.update(time, engine.camera);
     },
   };
 }

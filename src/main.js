@@ -12,7 +12,9 @@ const ui = new Interface(app, {
   motion: () => { reduced = !reduced; applyMotion(); },
   activity: async id => {
     const module = await import('./ui/activities.js');
-    if (id === 'gravity') module.gravityActivity(ui); else module.impactActivity(ui);
+    if (id === 'gravity') module.gravityActivity(ui);
+    else if (id === 'solar') module.solarActivity(ui);
+    else module.impactActivity(ui);
   },
 });
 document.querySelector('#boot-status')?.remove();
@@ -53,7 +55,7 @@ async function home(initial = false) {
     const nextPromise = import('./scenes/space.js').then(m => m.createSpace(engine)).then(value => ({ value }), error => ({ error }));
     if (world) {
       world.novi.setMoving(true); const from = world.novi.root.position.clone();
-      await engine.animate(duration(1.4), t => { world.novi.root.position.copy(from).add(new THREE.Vector3(0, t * 12, -t * 5)); world.novi.setTransform(1 - t); }, signal);
+      await engine.animate(duration(1.4), t => { world.novi.root.position.copy(from).add(new THREE.Vector3(0, t * 12, -t * 5)); if (world.kind === 'moon') world.novi.setTransform(1 - t); }, signal);
     }
     const result = await nextPromise;
     if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
@@ -68,16 +70,28 @@ async function destination(id) {
   const signal = begin(id === 'moon' ? 'Course set for the Moon. Let’s follow our curiosity.' : `Flying to our ${id === 'earth' ? 'Earth' : 'Sun'} viewing point…`);
   try {
     world.novi.setMoving(true);
-    if (id !== 'moon') {
+    if (id === 'sun') {
+      const nextPromise = import('./scenes/sun.js').then(m => m.createSolarScene()).then(value => ({ value }), error => ({ error }));
+      const shipFrom = world.novi.root.position.clone();
+      const shipTo = world.sun.position.clone().add(new THREE.Vector3(-1.5, -1, 3));
+      const flight = engine.animate(duration(2.2), t => world.novi.root.position.lerpVectors(shipFrom, shipTo, t), signal);
+      await engine.view(world.sun.position.clone().add(new THREE.Vector3(0, 0, 6)), world.sun.position.clone(), duration(2.2), signal);
+      await flight;
+      const result = await nextPromise;
+      if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
+      if (result.error) throw result.error;
+      swap(result.value); settle(); ui.status('Welcome to the solar observatory. Tap a glowing node to investigate our star.'); return;
+    }
+    if (id === 'earth') {
       const object = world[id];
       const mobile = innerWidth < 760;
       const destinationCamera = mobile
-        ? object.position.clone().add(new THREE.Vector3(0, 0, id === 'earth' ? 19 : 10))
-        : id === 'earth' ? new THREE.Vector3(1, 1, 10.5) : object.position.clone().add(new THREE.Vector3(0, 0, 6));
+        ? object.position.clone().add(new THREE.Vector3(0, 0, 19))
+        : new THREE.Vector3(1, 1, 10.5);
       const shipFrom = world.novi.root.position.clone();
-      const shipTo = object.position.clone().add(id === 'earth' ? new THREE.Vector3(-3.4, -1.8, 4) : new THREE.Vector3(-1.3, -1, 2.3));
+      const shipTo = object.position.clone().add(new THREE.Vector3(-3.4, -1.8, 4));
       const flight = engine.animate(duration(2), t => { world.novi.root.position.lerpVectors(shipFrom, shipTo, t); }, signal);
-      const introLook = object.position.clone().add(new THREE.Vector3(0, mobile ? (id === 'earth' ? -3.3 : -1.7) : 0, 0));
+      const introLook = object.position.clone().add(new THREE.Vector3(0, mobile ? -3.3 : 0, 0));
       await engine.view(destinationCamera, introLook, duration(2), signal); await flight;
       if (signal.aborted) return; settle(); ui.showDiscovery(id); return;
     }
@@ -108,9 +122,20 @@ async function destination(id) {
 }
 
 async function inspect(id) {
-  if (busy || world?.kind !== 'moon' || !world.labels.some(label => label.id === id)) return;
+  if (busy || !['moon', 'sun'].includes(world?.kind) || !world.labels.some(label => label.id === id)) return;
   const signal = begin(`Novi is heading to ${discoveries[id].title}…`);
   world.visiting = true; world.novi.setMoving(true);
+  if (world.kind === 'sun') {
+    const anchor = world.labels.find(label => label.id === id).object.position;
+    const from = world.novi.root.position.clone(), to = anchor.clone();
+    // Stay in front of the star: there is no solid surface to land on.
+    to.z = 6; to.x -= .8; to.y -= .8;
+    const view = world.view(true);
+    const flight = engine.animate(duration(1.6), t => world.novi.root.position.lerpVectors(from, to, t), signal);
+    await engine.view(view.position, view.look, duration(1.6), signal); await flight;
+    if (signal.aborted) return;
+    settle(); world.novi.setScanning(true); ui.showDiscovery(id); return;
+  }
   const data = discoveries[id], target = new THREE.Vector3(...data.stop), from = world.novi.root.position.clone();
   target.y = world.terrainHeight(target.x, target.z) + 1;
   const center = new THREE.Vector3(...data.position); center.y = world.terrainHeight(center.x, center.z);
@@ -136,6 +161,14 @@ async function inspect(id) {
 
 async function back() {
   if (busy) return;
+  if (world?.kind === 'sun') {
+    const signal = begin('Returning to our solar viewing point…');
+    const view = world.view(), from = world.novi.root.position.clone();
+    const flight = engine.animate(duration(1.2), t => world.novi.root.position.lerpVectors(from, new THREE.Vector3(-5, -3.7, 5), t), signal);
+    await engine.view(view.position, view.look, duration(1.2), signal); await flight;
+    if (signal.aborted) return;
+    world.visiting = false; settle(); return;
+  }
   if (world?.kind !== 'moon') { await home(); return; }
   const signal = begin('Pulling back for a little perspective…');
   const destination = world.overviewPosition();

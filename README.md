@@ -28,13 +28,14 @@ npm run preview
 
 ## Playable scope
 
-- Rotating NASA-textured Earth, a textured Moon slowly orbiting Earth, stylized Sun, starfield, atmospheric rim lighting, and an original articulated 3D Novi spacecraft with a visible idle hover and gentle sway. The Moon completes an artistic orbit in 150 seconds; its position locks during navigation. Reduce Motion freezes ambient movement.
+- Rotating NASA-textured Earth, a textured Moon slowly orbiting Earth, a plasma-textured Sun with soft additive glare and rays, starfield, atmospheric rim lighting, and an original articulated 3D Novi spacecraft with a visible idle hover and gentle sway. The Moon completes an artistic orbit in 150 seconds; its position locks during navigation. Reduce Motion freezes ambient movement, including solar plasma and corona animation.
 - Click/tap destinations, cinematic automatic flight, descent, continuous engine-pod and wing transformation into lunar hover mode, automatic approaches and scanning, Back and Home.
 - A localized artistic Tycho-region diorama with selectable **Tycho** and **Tycho A**, terraced crater terrain, central peak, scattered instanced debris, representative breccia and anorthosite boulders, and a fictional gravity-lab instrument.
 - Each discovery has an explanation, fact, optional deeper text, and primary-source links. No progression gates or collection requirements.
 - An ideal gravity experiment with two different masses on both worlds; tap plus/minus to set 1–20 m drop height, then compare timed drops.
 - An impact-energy experiment with 5, 10, and 20 km/s choices, calculated kinetic energy, and a deliberately qualitative crater animation.
-- Earth and Sun have accessible orbital introductions. Their future surface/solar environments are explicitly labeled as future expansion.
+- A solar observatory reached by tapping the Sun: animated granular plasma, dark sunspot groups, luminous prominence strands, and a streaming corona. Four unlabeled nodes reveal NASA-linked science about the photosphere, sunspots, prominences and corona, with a replayable three-question Sun detective activity. Novi remains a spacecraft; there is no solar landing.
+- Earth has an accessible orbital introduction. Its future surface environments are explicitly labeled as future expansion.
 - Responsive 390 px phone and desktop layouts, unlabeled glowing HTML nodes for all raycast targets, with 44 px touch areas, native modal focus management, accessible names, and a Reduce Motion toggle. System reduced-motion preference is respected on initial load. Keyboard activation of buttons works; there are no keyboard movement controls.
 
 ## Structure
@@ -47,8 +48,10 @@ src/core/assets.js          Local texture loader and procedural microtexture
 src/core/dispose.js         Deduplicated GPU-resource disposal
 src/core/math.js            Deterministic art helpers and experiment physics
 src/models/novi.js          Original multi-part character/craft rig and animation
+src/models/sun.js           Shared plasma, sunspot, prominence and additive glare shaders/meshes
 src/scenes/space.js         Space scene and responsive planet composition
 src/scenes/moon.js          On-demand lunar diorama and POIs
+src/scenes/sun.js           On-demand solar observatory and responsive discovery views
 src/scenes/shared.js        Starfield, atmosphere and beacons
 src/data/discoveries.js     Source-linked science records and POI definitions
 src/ui/interface.js         Accessible HUD, panels and dialogs
@@ -72,7 +75,7 @@ This is an authored diorama, **not** a geographic simulator or photogrammetry. C
 
 The gravity experiment uses constant surface gravity and no air resistance on **both** worlds: `t = sqrt(2h/g)`, with Earth 9.81 m/s² and Moon 1.62 m/s². The impact activity calculates `E = ½mv²` in SI units. It does not calculate crater diameters, reproduce Tycho's impact, or solve impact hydrodynamics.
 
-The Sun is an illustrative emissive sphere with a corona-like halo; it is not a scientific solar image. Lighting and planet arrangement are artistic, not a physical ephemeris. Earth's rotating texture is a historical July 2004 composite, not live weather. No orbital-accuracy or accurate-scale mode is implemented.
+The Sun uses authored shaders for granular plasma, illustrative sunspots, prominence strands and a corona-like halo. Glare/rays illustrate optical scattering; the halo is not a solid solar layer. Colors, feature placement, dimensions and animation speeds are artistic, not live solar data or a fluid/magnetic simulation. Novi’s viewing position is fictional. Lighting and planet arrangement are artistic, not a physical ephemeris. Earth's rotating texture is a historical July 2004 composite, not live weather. No orbital-accuracy or accurate-scale mode is implemented.
 
 See [SCIENCE.md](SCIENCE.md) and [ASSET_LICENSES.md](ASSET_LICENSES.md) for reviewed sources and rights provenance; [VERIFICATION.md](VERIFICATION.md) for actual checks and remaining limits.
 
