@@ -1,16 +1,20 @@
 # Deploy from GitHub
 
-The source repository is https://github.com/tanjbmath/noviverse. Uploading source does not deploy the game. The Pages workflow is **manual only**; it has no push trigger.
+The repository is https://github.com/tanjbmath/noviverse. It includes editable source and a generated static copy at the repository root. `npm run build` refreshes both `dist/` and this root copy.
 
-## GitHub Pages
+## Current branch-based Pages setup
+
+Pages can publish **main / (root)** directly. The tracked root `index.html`, `assets/`, `textures/`, and `.nojekyll` are already built and work under `/noviverse/`. Updating those files triggers the repository's existing Pages deployment. Edit `src/index.html` for HTML changes, then run `npm run build` and commit the updated source and generated root files together.
+
+## Optional GitHub Actions setup
 
 1. In the repository, open **Settings → Pages**. Under **Build and deployment**, choose **GitHub Actions** as the source.
 2. Open **Actions → Deploy NoviVerse to GitHub Pages → Run workflow**, choose `main`, then run it when you are ready to publish.
 3. The workflow installs the locked dependencies, runs tests and asset verification, builds the game, and deploys only `dist/`. Its deployment summary supplies the real site URL after success.
 
-Do not select the unbuilt repository root as a branch-based Pages site: its `index.html` is Vite source and needs the build step. Do not double-click `index.html` for local play; use `Start-NoviVerse.cmd` instead.
+The root copy is now safe for branch-based Pages publishing too. Do not replace it with the editable `src/index.html`: that file requires Vite. For local play, use `Start-NoviVerse.cmd` instead of opening either HTML file directly.
 
-The workflow uses official GitHub Actions release versions checked on 27 November 2026. It has not been run by the uploader; no deployment success or live URL is claimed.
+The custom workflow uses official GitHub Actions release versions checked on 27 November 2026 and remains manual-only. It is optional when the current branch-based Pages setup is used.
 
 [GitHub documentation for Pages workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
 

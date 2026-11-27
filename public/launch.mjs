@@ -21,7 +21,7 @@ const server = createServer(async (request, response) => {
   let requested;
   try { requested = decodeURIComponent(new URL(request.url, 'http://localhost').pathname); }
   catch { response.writeHead(400); response.end('Invalid address'); return; }
-  const candidate = resolve(root, `.${requested === '/' ? '/index.html' : requested}`);
+  const candidate = resolve(root, `.${requested.endsWith('/') ? `${requested}index.html` : requested}`);
   if (!contained(candidate)) { response.writeHead(403); response.end('Not available'); return; }
   try {
     const file = await realpath(candidate);

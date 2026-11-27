@@ -1,6 +1,6 @@
 # Verification record
 
-Verified locally on 27 November 2026 in the Windows workspace. This is a **new independent project directory**, not a modification of an existing educational repository. The user subsequently designated the empty `tanjbmath/noviverse` GitHub repository for source upload. No deployment was triggered. Temporary local preview servers were used only for testing and stopped after packaging.
+Verified locally on 27 November 2026 in the Windows workspace. This is a **new independent project directory**, not a modification of an existing educational repository. The user subsequently designated the empty `tanjbmath/noviverse` GitHub repository for source upload and enabled branch-based Pages publishing. A repair adds a prebuilt root copy for that publishing method. Temporary local preview servers are used for testing.
 
 ## Automated checks
 
@@ -41,7 +41,11 @@ During development, a harmless geometry-conversion warning was removed. A previe
 - Novi is a detailed multi-part code-authored rig, not an imported GLB. Geometry/materials/animations are editable in `src/models/novi.js`; no standalone DCC model or skeletal animation file is included.
 - The Moon map's official NASA endpoint was blocked; a credited research mirror supplied the named NASA texture. Its bytes could not be compared with the blocked original. This provenance limitation is explicit in the asset manifest and licensing notes.
 - WebGL2 and an HTTP server are required. No service worker, installable app, persistence, analytics or offline-cache guarantee is included.
-- No live site URL, hosting registration or deployment is claimed. The included Pages workflow requires the owner to run it manually; its cloud execution is not verified by the local checks.
+- The optional custom Pages workflow requires the owner to run it manually. The existing branch-based Pages deployment publishes the tracked root copy when it changes.
+
+## GitHub Pages blank-screen repair
+
+The live URL was serving the unbuilt root HTML with `/src/main.js`, and its deployment run used Jekyll rather than Vite. The repair moves the editable entry to `src/index.html`, serves it through Vite for development, and publishes built HTML/bundles/textures at the repository root. A `.nojekyll` marker keeps that root copy static. The build now verifies the generated entry, linked assets, imagery and `/noviverse/` subpath for both root and `dist/`. A visible startup status and import-failure message replace a blank screen if loading fails.
 
 ## Local launch repair
 

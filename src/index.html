@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#080e20" />
+    <meta name="description" content="Meet Novi. Tap a world, take a little voyage, and discover the science of the Moon. A free, static 3D exploration playground." />
+    <title>NoviVerse · A universe of discoveries</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  </head>
+  <body style="margin:0;background:#080e20;color:#ecf5fa">
+    <main id="app" aria-label="NoviVerse space exploration"></main>
+    <div id="boot-status" role="status" style="position:fixed;inset:0;z-index:900;display:grid;place-content:center;padding:32px;text-align:center;background:#080e20;color:#ecf5fa;font:18px/1.6 'Segoe UI',sans-serif">
+      <strong style="font-size:30px">NoviVerse</strong>
+      <p id="boot-detail">Preparing a universe of discoveries…</p>
+    </div>
+    <section id="local-file-help" hidden style="position:fixed;inset:0;z-index:1000;place-content:center;gap:18px;padding:32px;background:#080e20;color:#ecf5fa;font:18px/1.6 'Segoe UI',sans-serif">
+      <h1 style="font-size:32px;margin:0">Let’s open NoviVerse properly.</h1>
+      <p style="max-width:600px;margin:0">Close this tab and double-click <strong>Start-NoviVerse.cmd</strong> in the same folder. It will start a local preview and open the game in your browser.</p>
+      <p style="max-width:600px;margin:0;color:#a4b3c8">Keep the launcher window open while playing. NoviVerse’s 3D modules cannot run by opening index.html directly.</p>
+    </section>
+    <script>
+      if (location.protocol === 'file:') {
+        document.getElementById('boot-status').remove();
+        const help = document.getElementById('local-file-help'); help.hidden = false; help.style.display = 'grid';
+      } else {
+        const explain = () => { const detail = document.getElementById('boot-detail'); if (detail) detail.textContent = 'The game files could not load. Refresh this page. If the problem continues, check that the built game and its assets were published together.'; };
+        window.addEventListener('error', explain, true);
+        window.addEventListener('unhandledrejection', explain);
+        setTimeout(() => { const detail = document.getElementById('boot-detail'); if (detail) detail.textContent = 'Still loading the game files. Check your connection, then refresh if needed.'; }, 15000);
+      }
+    </script>
+    <noscript>NoviVerse needs JavaScript and WebGL2 to draw its 3D worlds. Read about the Moon at https://science.nasa.gov/moon/.</noscript>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

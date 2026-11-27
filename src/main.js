@@ -15,6 +15,7 @@ const ui = new Interface(app, {
     if (id === 'gravity') module.gravityActivity(ui); else module.impactActivity(ui);
   },
 });
+document.querySelector('#boot-status')?.remove();
 function applyMotion() {
   if (engine) engine.paused = reduced;
   document.body.classList.toggle('reduced-motion', reduced);

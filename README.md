@@ -24,7 +24,7 @@ npm run build
 npm run preview
 ```
 
-`dist/` is the complete static site. Upload its **contents** to a static host when you choose to publish. Relative asset paths support a subdirectory, including GitHub Pages. The source is prepared for the user-designated repository [tanjbmath/noviverse](https://github.com/tanjbmath/noviverse). See [DEPLOYMENT.md](DEPLOYMENT.md) for host settings and the included manually triggered GitHub Pages workflow. Uploading source does not automatically deploy it.
+`dist/` is the complete static site. `npm run build` also refreshes the tracked static copy at the repository root, so GitHub Pages can publish **main / (root)** directly. Relative asset paths support the `/noviverse/` repository subpath. Editable HTML is in `src/index.html`; the root `index.html` is generated. See [DEPLOYMENT.md](DEPLOYMENT.md) for branch-based Pages, the optional manual Actions workflow, and other static hosts. Updating the root copy can trigger an existing branch-based Pages deployment.
 
 ## Playable scope
 
@@ -41,6 +41,7 @@ npm run preview
 
 ```text
 src/main.js                 Navigation and interruptible journey orchestration
+src/index.html              Editable Vite HTML entry and startup recovery message
 src/core/engine.js          Renderer, frame loop, raycasting, camera tweening
 src/core/assets.js          Local texture loader and procedural microtexture
 src/core/dispose.js         Deduplicated GPU-resource disposal
@@ -55,6 +56,10 @@ src/ui/activities.js        On-demand experiment module
 public/textures/            Bundled NASA maps (no runtime hotlink dependency)
 public/asset-manifest.json  Origin, usage terms, credits, hashes and sizes
 tests/                     Physics, content, terrain, transform and disposal checks
+index.html, assets/          Generated static entry and bundles for branch-based Pages
+textures/                   Generated copies of the credited public textures
+scripts/publish-root.mjs     Refreshes the built root copy without deleting source
+scripts/verify-site.mjs      Guards against publishing the unbuilt Vite HTML entry
 ```
 
 The Moon scene is dynamically imported at destination selection; its terrain, rock textures, and meshes are constructed on demand. Experiments are imported only when opened. Earth/Moon overview maps are needed at startup to display those visible worlds. Assets are disposed when changing scenes; repeat visits reconstruct them. The single Three.js renderer is reused.
