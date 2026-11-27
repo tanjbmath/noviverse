@@ -66,16 +66,17 @@ export function createNovi() {
   }
   const smile = new THREE.Mesh(new THREE.TorusGeometry(0.095, 0.012, 6, 18, Math.PI * 0.72), palette.glow);
   smile.rotation.z = Math.PI * 1.14; smile.position.set(0.04, -0.095, 0.47); head.add(smile);
+  const arms = [], seatedFeet = [];
   for (const sign of [-1, 1]) {
     tube(head, 'dark', [sign * 0.465, 0, 0], [0.13, 0.11, 0.13], 0).rotation.z = Math.PI / 2;
     ball(head, 'orange', [sign * 0.52, 0, 0], [0.065, 0.11, 0.11]);
-    const arm = new THREE.Group(); arm.position.set(sign * 0.32, 0.34, 0); character.add(arm);
+    const arm = new THREE.Group(); arm.position.set(sign * 0.32, 0.34, 0); character.add(arm); arms.push(arm);
     ball(arm, 'teal', [0, 0, 0], [0.1, 0.1, 0.1]);
     const limb = block(arm, 'pearl', [sign * 0.08, -0.14, 0.08], [0.12, 0.29, 0.13]); limb.rotation.z = sign * 0.45;
     ball(arm, 'dark', [sign * 0.12, -0.26, 0.16], [0.09, 0.09, 0.1]);
     block(arm, 'orange', [sign * 0.12, -0.22, 0.18], [0.12, 0.06, 0.12]);
-    block(character, 'dark', [sign * 0.16, -0.1, 0.13], [0.15, 0.19, 0.25]);
-    block(character, 'pearl', [sign * 0.16, -0.16, 0.19], [0.17, 0.1, 0.29]);
+    seatedFeet.push(block(character, 'dark', [sign * 0.16, -0.1, 0.13], [0.15, 0.19, 0.25]));
+    seatedFeet.push(block(character, 'pearl', [sign * 0.16, -0.16, 0.19], [0.17, 0.1, 0.29]));
   }
   tube(head, 'teal', [0.29, 0.49, -0.04], [0.015, 0.23, 0.015]);
   ball(head, 'warm', [0.29, 0.61, -0.04], [0.055, 0.055, 0.055]);
@@ -105,10 +106,43 @@ export function createNovi() {
   tube(scanner, 'dark', [0, 0.13, 0], [0.035, 0.24, 0.035]);
   ball(scanner, 'pearl', [0, 0.26, 0], [0.15, 0.1, 0.12]);
   ball(scanner, 'glow', [0, 0.26, 0.11], [0.08, 0.06, 0.03]);
+  // The same pilot and face unfold into a walking field explorer. Ship parts
+  // fold into the backpack while articulated legs and treaded boots deploy.
+  const groundRig = new THREE.Group(); groundRig.name = 'Earth walking rig'; character.add(groundRig);
+  const legs = [];
+  for (const sign of [-1, 1]) {
+    const leg = new THREE.Group(); leg.position.set(sign * .17, -.05, 0); groundRig.add(leg); legs.push(leg);
+    ball(leg, 'teal', [0, 0, 0], [.11, .11, .11]);
+    block(leg, 'pearl', [0, -.15, 0], [.17, .25, .18]);
+    ball(leg, 'dark', [0, -.28, .02], [.10, .10, .10]);
+    block(leg, 'orange', [0, -.29, .10], [.13, .09, .06]);
+    block(leg, 'pearl', [0, -.42, .03], [.16, .24, .17]);
+    for (const x of [-.065, .065]) tube(leg, 'dark', [x, -.42, .12], [.012, .19, .012]);
+    block(leg, 'dark', [0, -.58, .08], [.23, .13, .36]);
+    block(leg, 'teal', [0, -.52, .08], [.21, .10, .32]);
+    for (let i = 0; i < 4; i++) block(leg, 'rubber', [0, -.635, -.04 + i * .08], [.24, .025, .035]);
+    block(leg, 'glow', [0, -.51, .25], [.12, .025, .018]);
+  }
+  const foldedShipParts = hull.children.filter(part => part !== character).map(part => ({ part, position: part.position.clone(), scale: part.scale.clone() }));
   const scanRing = ring(root, 'glow', [0, -0.4, 0], 1.1, 0.013, Math.PI / 2); scanRing.visible = false;
-  let mode = 0, moving = false, scanning = false, idleBlend = 1;
+  let mode = 0, earthMode = 0, moving = false, scanning = false, idleBlend = 1;
+  function setEarthMode(value) {
+    earthMode = Math.max(0, Math.min(1, value));
+    groundRig.visible = earthMode > 0; groundRig.scale.y = Math.max(.001, earthMode);
+    character.position.y = .54 + .91 * earthMode; character.scale.setScalar(1 + 1.1 * earthMode);
+    for (const { part, position, scale } of foldedShipParts) {
+      part.visible = earthMode < 1;
+      part.position.copy(position).lerp(new THREE.Vector3(0, .4, -.3), earthMode);
+      part.scale.copy(scale).multiplyScalar(Math.max(.001, (1 - earthMode) ** 2));
+    }
+    seatedFeet.forEach(foot => { foot.visible = earthMode < .35; });
+    flames.forEach(flame => { flame.visible = earthMode === 0; });
+  }
+  setEarthMode(0);
   return {
     root,
+    setEarthMode,
+    get earthMode() { return earthMode; },
     setTransform(t) { mode = t; pods.forEach(p => { p.rotation.x = -t * Math.PI / 2; }); fins.forEach((f, i) => { f.rotation.y = (i ? 1 : -1) * t * 0.35; }); },
     setMoving(value) { moving = value; },
     setScanning(value) { scanning = value; scanRing.visible = value; },
@@ -116,10 +150,13 @@ export function createNovi() {
       const animate = !reduced;
       // Animate the local hull so cinematic navigation keeps ownership of the root.
       idleBlend += ((!moving && mode === 0 ? 1 : 0) - idleBlend) * (1 - Math.exp(-5 * dt));
-      hull.position.y = animate ? Math.sin(time * 1.5) * (0.035 + idleBlend * 0.185) : 0;
-      hull.position.x = animate ? Math.sin(time * 0.7) * idleBlend * 0.045 : 0;
-      hull.rotation.x = animate ? Math.sin(time * 0.6) * idleBlend * 0.018 : 0;
-      hull.rotation.z = animate ? Math.sin(time * 0.8) * (moving ? 0.07 : 0.022 + idleBlend * 0.018) : 0;
+      const groundWalk = moving && earthMode > .8;
+      hull.position.y = animate ? Math.sin(time * 1.5) * (0.035 + idleBlend * 0.185) * (1 - earthMode) + (groundWalk ? Math.abs(Math.sin(time * 7)) * .035 : 0) : 0;
+      hull.position.x = animate ? Math.sin(time * 0.7) * idleBlend * 0.045 * (1 - earthMode) : 0;
+      hull.rotation.x = animate ? Math.sin(time * 0.6) * idleBlend * 0.018 * (1 - earthMode) : 0;
+      hull.rotation.z = animate ? Math.sin(time * 0.8) * (moving ? 0.07 : 0.022 + idleBlend * 0.018) * (1 - earthMode) : 0;
+      legs.forEach((leg, i) => { leg.rotation.x = animate && groundWalk ? Math.sin(time * 7 + i * Math.PI) * .38 : 0; });
+      arms.forEach((arm, i) => { arm.rotation.x = animate && groundWalk ? -Math.sin(time * 7 + i * Math.PI) * .32 : 0; });
       head.rotation.y = scanning ? Math.sin(time * 2) * 0.22 : animate ? Math.sin(time * 0.7) * 0.12 : 0;
       eyes.scale.y = animate && Math.sin(time * 1.1) > 0.993 ? 0.1 : 1;
       flames.forEach((f, i) => { f.scale.y = (moving ? 1.6 : mode ? 0.6 : 0.4) + (animate ? Math.sin(time * 12 + i) * 0.1 : 0); });

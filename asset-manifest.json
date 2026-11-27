@@ -6,7 +6,7 @@
       "sha256": "f55226d46d27e05511f2118dc6aa24f5dbf9b6b2cddc87cc6e0e7dd067c00b11",
       "bytes": 1617810,
       "title": "Blue Marble Next Generation, July 2004",
-      "credit": "NASA Earth Observatory / Reto Stöckli",
+      "credit": "NASA Earth Observatory / Reto St\u00f6ckli",
       "source": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/",
       "download": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/july/world.200407.3x5400x2700.jpg",
       "usage": "NASA educational/informational media usage permission; no endorsement implied",
@@ -25,6 +25,36 @@
       "usage": "NASA SVS public-domain visualization, educational/informational use; retain credit",
       "terms": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
       "modifications": "Unmodified mirrored JPEG. NASA endpoint returned HTTP 403; downloaded the same named map from a lunar-impact research repository. Official origin and published dimensions verified; byte identity to blocked original cannot be independently confirmed."
+    },
+    {
+      "file": "wonders/merapi.jpg",
+      "sha256": "6fbce67e94fc9d8cbbb69cef05b944b062e19ab011582c708d5b1cadec9467f4",
+      "bytes": 486677,
+      "title": "NoviVerse merapi scenic illustration",
+      "credit": "Original AI-generated artwork created for NoviVerse",
+      "source": "Original project artwork; generation prompts recorded in docs/wonder-art-prompts.md",
+      "usage": "Project artwork, educational illustration; not a photograph or surveyed reconstruction",
+      "modifications": "Generated separately, full frame preserved; converted to optimized JPEG, no sprite-sheet extraction."
+    },
+    {
+      "file": "wonders/himalayas.jpg",
+      "sha256": "3ba275b33d2c3836a4a4878c1395e79b1b317e1fd7a3bc66546565814a71f3b9",
+      "bytes": 584003,
+      "title": "NoviVerse himalayas scenic illustration",
+      "credit": "Original AI-generated artwork created for NoviVerse",
+      "source": "Original project artwork; generation prompts recorded in docs/wonder-art-prompts.md",
+      "usage": "Project artwork, educational illustration; not a photograph or surveyed reconstruction",
+      "modifications": "Generated separately, full frame preserved; converted to optimized JPEG, no sprite-sheet extraction."
+    },
+    {
+      "file": "wonders/borneo.jpg",
+      "sha256": "7e8afacecbb2fdac5aa3e73a0ae783f64cc6385ad9f1f8263ae29303854909b9",
+      "bytes": 593135,
+      "title": "NoviVerse borneo scenic illustration",
+      "credit": "Original AI-generated artwork created for NoviVerse",
+      "source": "Original project artwork; generation prompts recorded in docs/wonder-art-prompts.md",
+      "usage": "Project artwork, educational illustration; not a photograph or surveyed reconstruction",
+      "modifications": "Generated separately, full frame preserved; converted to optimized JPEG, no sprite-sheet extraction."
     }
   ]
 }

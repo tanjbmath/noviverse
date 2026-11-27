@@ -4,6 +4,7 @@ import { Engine } from './core/engine.js';
 import { disposeScene } from './core/dispose.js';
 import { Interface } from './ui/interface.js';
 import { discoveries } from './data/discoveries.js';
+import { earthSites, earthRegions } from './data/earth.js';
 
 const app = document.querySelector('#app');
 let engine, world, operation = new AbortController(), busy = true, reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -11,13 +12,24 @@ const ui = new Interface(app, {
   destination: id => destination(id), poi: id => inspect(id), home: () => home(), back: () => back(),
   motion: () => { reduced = !reduced; applyMotion(); },
   earthControl: action => { if (!busy && world?.kind === 'earth' && !ui.activeDiscovery) world.navigateControl(action); },
-  activity: async id => {
+  activity: id => runActivity(id),
+  wonderActivity: () => { if (!busy && world?.kind === 'wonder') runActivity(`wonder:${world.siteId}`); },
+});
+async function runActivity(id) {
+  const signal = operation.signal;
+  try {
+    if (id.startsWith('wonder:')) {
+      const module = await import('./ui/wonder-activity.js');
+      if (!signal.aborted) module.wonderActivity(ui, id.slice(7));
+      return;
+    }
     const module = await import('./ui/activities.js');
+    if (signal.aborted) return;
     if (id === 'gravity') module.gravityActivity(ui);
     else if (id === 'solar') module.solarActivity(ui);
     else module.impactActivity(ui);
-  },
-});
+  } catch (error) { if (!signal.aborted) report(error); }
+}
 document.querySelector('#boot-status')?.remove();
 function applyMotion() {
   if (engine) engine.paused = reduced;
@@ -55,8 +67,12 @@ async function home(initial = false) {
     // Start the lazy module/assets while the ascent plays. Result wrappers prevent unhandled rejections.
     const nextPromise = import('./scenes/space.js').then(m => m.createSpace(engine)).then(value => ({ value }), error => ({ error }));
     if (world) {
-      world.novi.setMoving(true); const from = world.novi.root.position.clone();
-      await engine.animate(duration(1.4), t => { world.novi.root.position.copy(from).add(new THREE.Vector3(0, t * 12, -t * 5)); if (world.kind === 'moon') world.novi.setTransform(1 - t); }, signal);
+      world.novi.setMoving(true); const from = world.novi.root.position.clone(), earthMode = world.novi.earthMode;
+      await engine.animate(duration(1.4), t => {
+        world.novi.root.position.copy(from).add(new THREE.Vector3(0, t * 12, -t * 5));
+        if (world.kind === 'moon') world.novi.setTransform(1 - t);
+        if (world.kind === 'wonder') world.novi.setEarthMode(earthMode * (1 - t));
+      }, signal);
     }
     const result = await nextPromise;
     if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
@@ -123,11 +139,36 @@ async function destination(id) {
 }
 
 async function inspect(id) {
+  if (world?.kind === 'wonder') {
+    if (busy || !world.labels.some(label => label.id === id)) return;
+    const signal = begin(`Novi is investigating ${discoveries[id].title}…`);
+    try {
+      if (!await world.focus(id, engine, duration(1.6), signal)) return;
+      world.resize(engine); settle(); world.novi.setScanning(true); ui.showDiscovery(id);
+    } catch (error) { if (!signal.aborted) report(error); }
+    return;
+  }
   if (world?.kind === 'earth') {
     if (busy || !world.labels.some(label => label.id === id)) return;
     const signal = begin('Novi is following a new Earth discovery…');
     try {
       world.novi.setMoving(true);
+      if (earthSites[id]) {
+        const nextPromise = import('./scenes/wonder.js').then(m => m.createWonder(id, engine)).then(value => ({ value }), error => ({ error }));
+        await world.focus(id, engine, duration(1.6), signal);
+        const result = await nextPromise;
+        if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
+        if (result.error) throw result.error;
+        swap(result.value); ui.wonder(world.siteId);
+        ui.setBusy(true, 'Wings folding. Boots deploying. Novi’s Earth explorer is ready!');
+        world.novi.setMoving(true); const landed = world.overviewPose();
+        await engine.animate(duration(1.8), t => {
+          world.novi.setEarthMode(t);
+          world.novi.root.position.copy(landed).add(new THREE.Vector3(0, (1 - t) * 2.5, 0));
+        }, signal);
+        if (signal.aborted) return;
+        world.resize(engine); settle(); ui.status('Boots deployed. Tap a glowing node for a closer look, or try the discovery challenge.'); return;
+      }
       if (!await world.focus(id, engine, duration(1.7), signal)) return;
       ui.world('earth', world.labels); ui.earthRegion(world.region); settle();
       if (world.visiting) { world.novi.setScanning(true); ui.showDiscovery(id); }
@@ -174,6 +215,29 @@ async function inspect(id) {
 
 async function back() {
   if (busy) return;
+  if (world?.kind === 'wonder') {
+    const signal = begin(world.visiting ? 'Returning to our lookout…' : 'Folding our explorer boots. Returning to the continent…');
+    try {
+      if (world.visiting) {
+        if (!await world.focus(null, engine, duration(1.2), signal)) return;
+        world.resize(engine); settle(); return;
+      }
+      const region = world.region;
+      const nextPromise = import('./scenes/earth.js').then(m => m.createEarth(engine)).then(value => ({ value }), error => ({ error }));
+      const from = world.novi.root.position.clone(), earthMode = world.novi.earthMode;
+      world.novi.setMoving(true);
+      await engine.animate(duration(1.5), t => {
+        world.novi.setEarthMode(earthMode * (1 - t));
+        world.novi.root.position.copy(from).add(new THREE.Vector3(0, t * 4, 0));
+      }, signal);
+      const result = await nextPromise;
+      if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
+      if (result.error) throw result.error;
+      result.value.setLevel(region); result.value.controls.setPose(earthRegions[region]);
+      swap(result.value); ui.earthRegion(region); settle(); return;
+    } catch (error) { if (!signal.aborted) report(error); }
+    return;
+  }
   if (world?.kind === 'earth') {
     if (!world.region) { await home(); return; }
     const target = world.visiting ? world.region : 'globe';

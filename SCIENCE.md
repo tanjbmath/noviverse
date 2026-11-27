@@ -27,3 +27,12 @@ The globe reuses the credited NASA historical equirectangular map. All seven con
 - [UNESCO: Kinabatangan](https://www.unesco.org/en/mab/kinabatangan): linked forest/river/wetland habitats and biodiversity in northeastern Borneo. The 5.4° N, 117.9° E anchor is representative, not a surveyed reserve boundary or a present-day land-cover claim.
 
 This phase provides globe-based location discoveries. Volcanic terrain, walking, rainforest environments and underground cutaways are not implemented or implied by the introductory panels.
+
+
+## Wonder close-ups — 27 November 2026
+
+The three location scenes use artistic scenic illustrations with normalized feature anchors. They illustrate landforms and habitats rather than exact surveyed positions or current conditions. Novi’s transformation and travel are fictional. Features have source links in their details; picture challenges reinforce those same facts.
+
+- Merapi: summit/dome, loose volcanic deposits and rock cooling. Sources: Smithsonian GVP above, [USGS eruption processes](https://www.usgs.gov/faqs/how-do-volcanoes-erupt), [USGS lahars](https://www.usgs.gov/programs/VHP/lahars-move-rapidly-down-valleys-rivers-concrete), and [USGS igneous rocks](https://www.usgs.gov/faqs/what-are-igneous-rocks). The depicted lookout is imagined; no live activity, hazard-zone or specimen-identification claim is made.
+- Himalayas: plate compression and folding use the USGS Himalaya source above. Glacier accumulation and flow use [USGS glacier education](https://www.usgs.gov/water-science-school/science/glaciers-things-know). No named peak, measured glacier or deformation rate is claimed.
+- Borneo: habitat connectivity uses UNESCO Kinabatangan above; general forest layers and buttress support use [NParks forest ecosystems](https://www.nparks.gov.sg/nature/ecosystems/terrestrial-freshwater). These general plant structures are illustrated without identifying tree species or mapping an exact river reach.

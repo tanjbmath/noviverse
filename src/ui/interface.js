@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { icon } from './icons.js';
 import { earthRegions } from '../data/earth.js';
 import { discoveries, sources } from '../data/discoveries.js';
+import { wonders } from '../data/wonders.js';
 
 export class Interface {
   constructor(app, actions) {
@@ -41,6 +42,12 @@ export class Interface {
         <h1 id="earth-title">Hello, Earth.</h1>
         <p>Drag, swipe or scroll to turn.<br>Pinch to zoom. Tap a node to explore.</p>
       </section>
+      <section class="moon-intro wonder-intro" id="wonder-intro" hidden>
+        <button class="text-button" data-action="back">${icon('back')} Back to continent</button>
+        <h1 id="wonder-title"></h1>
+        <p>Tap a glowing node. Novi will investigate.</p>
+        <button class="primary" data-action="wonder-challenge">Play the discovery challenge</button>
+      </section>
       <nav id="earth-controls" class="earth-controls" aria-label="Globe navigation" hidden>
         <span class="sr-only">Turn the globe, zoom, or reset the current view.</span>
         <button data-earth-control="left" aria-label="Turn globe left">Left</button>
@@ -72,6 +79,7 @@ export class Interface {
       if (action === 'back') actions.back();
       if (action === 'close-discovery') actions.back();
       if (action === 'activity') actions.activity(this.activeDiscovery.activity);
+      if (action === 'wonder-challenge') actions.wonderActivity?.();
       if (action === 'close-modal') this.closeModal();
       if (action === 'about') this.about();
       if (action === 'motion') actions.motion();
@@ -87,6 +95,7 @@ export class Interface {
     document.querySelectorAll('[data-destination], [data-poi]').forEach(button => { button.disabled = busy; });
     document.body.classList.toggle('travelling', busy);
     this.elements['earth-controls'].querySelectorAll('button').forEach(button => { button.disabled = busy; });
+    document.querySelector('[data-action="wonder-challenge"]').disabled = busy;
   }
   world(kind, labels) {
     this.kind = kind;
@@ -95,6 +104,7 @@ export class Interface {
     this.elements['moon-intro'].hidden = kind !== 'moon';
     this.elements['sun-intro'].hidden = kind !== 'sun';
     this.elements['earth-intro'].hidden = kind !== 'earth';
+    this.elements['wonder-intro'].hidden = kind !== 'wonder';
     this.elements['earth-controls'].hidden = kind !== 'earth';
     this.elements['novi-message'].hidden = kind !== 'space';
     this.elements['location-chip'].textContent = kind === 'space' ? 'SPACE EXPLORER' : kind === 'sun' ? 'SUN · SOLAR OBSERVATORY' : kind === 'earth' ? 'EARTH · GLOBE EXPLORER' : 'MOON · TYCHO REGION';
@@ -110,6 +120,12 @@ export class Interface {
     this.elements['earth-eyebrow'].textContent = earthRegions[region]?.eyebrow || 'OUR LIVING PLANET';
     this.elements['earth-back'].innerHTML = `${icon('back')}${region ? 'Earth overview' : 'Back to space'}`;
     this.elements['location-chip'].textContent = region ? `EARTH · ${earthRegions[region].title.toUpperCase()}` : 'EARTH · GLOBE EXPLORER';
+  }
+  wonder(siteId) {
+    this.siteId = siteId;
+    this.elements['wonder-title'].textContent = wonders[siteId].title;
+    this.elements['location-chip'].textContent = `EARTH · ${wonders[siteId].title.toUpperCase()}`;
+    this.elements['field-note'].innerHTML = 'Illustrated landscape · Novi’s walking gear is fictional. <span>Features are representative, not surveyed terrain or a live view.</span>';
   }
   project(engine) {
     if (!this.labels) return;
@@ -131,7 +147,7 @@ export class Interface {
       ${d.activity ? `<button class="primary activity-button" data-action="activity">${icon('lab')}${d.activityTitle}</button>` : d === discoveries.earth ? '<span class="expansion">MORE ENVIRONMENTS · FUTURE EXPANSION</span>' : ''}
       <details><summary>A closer look</summary><p>${d.detail}</p></details>
       <details><summary>Science sources</summary><ul>${d.sourceIds.map(id => `<li><a href="${sources[id][1]}" target="_blank" rel="noopener noreferrer">${sources[id][0]}</a></li>`).join('')}</ul><small>Checked 27 November 2026</small></details>
-      <button class="text-button" data-action="back">${icon('back')}${this.kind === 'moon' ? 'Lunar overview' : this.kind === 'sun' ? 'Solar overview' : this.kind === 'earth' ? `${earthRegions[this.earthRegionId]?.title || 'Earth'} overview` : 'Back to space'}</button>`;
+      <button class="text-button" data-action="back">${icon('back')}${this.kind === 'moon' ? 'Lunar overview' : this.kind === 'sun' ? 'Solar overview' : this.kind === 'wonder' ? 'Back to the lookout' : this.kind === 'earth' ? `${earthRegions[this.earthRegionId]?.title || 'Earth'} overview` : 'Back to space'}</button>`;
     this.elements.discovery.hidden = false;
     document.body.classList.add('discovering');
     this.elements.discovery.querySelector('h2').focus({ preventScroll: true });
@@ -158,7 +174,7 @@ export class Interface {
       <p>Tap a world or a glowing node to discover its name and science. Novi navigates automatically. Back returns to the overview; Home returns to space. All destinations are open from the beginning. Nothing is saved.</p>
       <h3>Art & imagery credits</h3><p>Earth: NASA Earth Observatory, Blue Marble Next Generation (July 2004), Reto Stöckli. Moon: NASA / GSFC / Arizona State University, LRO CGI Moon Kit, Ernie Wright. Novi, equipment, terrain and interface are original code-authored artwork.</p>
       <p><a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a> · <a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noopener noreferrer">Moon map credits</a></p>
-      <p class="muted">Explore the Moon and the solar observatory. Earth has a turnable globe and Asia discovery stops; walking environments and other continent destinations are planned. Solar plasma, glare and magnetic loops are authored illustrations, not live imagery or a physical simulation. No accounts, analytics, storage, or backend services.</p>`);
+      <p class="muted">Explore the Moon and the solar observatory. Earth has a turnable globe and three illustrated Asia locations with an animated 3D walking explorer, feature discoveries and challenges. These scenic locations combine illustrated artwork with 3D characters; they are not reconstructed terrain. Other continents and underground exploration remain planned. Solar plasma, glare and magnetic loops are authored illustrations, not live imagery or a physical simulation. No accounts, analytics, storage, or backend services.</p>`);
   }
   error(message) {
     this.setBusy(false); this.openModal(`<p class="eyebrow">A LITTLE SPACE WEATHER</p><h2 id="modal-title">We couldn’t draw this world.</h2><p>${message}</p><p>Try reloading in a browser with WebGL2 enabled. If a texture failed to load, check that the textures folder is served with the site.</p><button class="primary" onclick="location.reload()">Try again</button><p><a href="https://science.nasa.gov/moon/">Explore Moon science at NASA</a></p>`);

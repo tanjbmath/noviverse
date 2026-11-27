@@ -15,3 +15,8 @@ NASA imagery is not a NASA partnership or endorsement. These are educational ass
 `public/asset-manifest.json` records source URLs, downloaded byte sizes and SHA-256 hashes. `npm run assets:verify` checks delivered file integrity; it is not a remote licensing service or proof of equality to a blocked source.
 
 The original local source remains available for the user's project. No separate commercial trademark clearance or worldwide legal opinion is implied by this asset review.
+
+
+## Earth wonder artwork
+
+`public/wonders/merapi.jpg`, `himalayas.jpg` and `borneo.jpg` are original AI-generated illustrations made separately for NoviVerse using the built-in image generation tool. Each full 1536 × 1024 image was converted to an optimized JPEG without cropping. They are not photographs, satellite products or surveyed reconstructions. No NASA/USGS/UNESCO endorsement is implied. Generation briefs are preserved in `docs/wonder-art-prompts.md`; hashes and sizes are recorded in `public/asset-manifest.json`. The background illustration and the animated 3D Novi model are separate scene elements.
