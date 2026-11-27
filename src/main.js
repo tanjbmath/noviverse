@@ -131,7 +131,7 @@ async function inspect(id) {
       if (!await world.focus(id, engine, duration(1.7), signal)) return;
       ui.world('earth', world.labels); ui.earthRegion(world.region); settle();
       if (world.visiting) { world.novi.setScanning(true); ui.showDiscovery(id); }
-      else ui.status('Welcome to Asia. Explore a glowing node, or turn the globe to look around.');
+      else ui.status('Our next continent is ready. Explore a glowing node, or turn the globe to look around.');
     } catch (error) { if (!signal.aborted) report(error); }
     return;
   }
@@ -177,7 +177,7 @@ async function back() {
   if (world?.kind === 'earth') {
     if (!world.region) { await home(); return; }
     const target = world.visiting ? world.region : 'globe';
-    const signal = begin(target === 'globe' ? 'Returning to our Earth overview…' : 'Returning to Asia…');
+    const signal = begin(target === 'globe' ? 'Returning to our Earth overview…' : 'Returning to the continent overview…');
     try {
       if (!await world.focus(target, engine, duration(1.2), signal)) return;
       ui.world('earth', world.labels); ui.earthRegion(world.region); settle();

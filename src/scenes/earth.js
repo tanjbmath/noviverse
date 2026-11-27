@@ -17,7 +17,9 @@ export function globeFrame(pose, width, height, discovery = false) {
   const usableHeight = Math.max(135, height - top - bottom);
   const usableWidth = width - (discovery && !mobile ? 430 : 40);
   const fit = Math.max(16, 5.3 / (tan * aspect * usableWidth / width), 5.3 / (tan * usableHeight / height));
-  const distance = Math.max(EARTH_RADIUS + 5, fit * pose.zoom);
+  // In a short landscape window, a continent view can crop the globe while keeping its stops large enough to tap.
+  const detail = width >= 760 && height < 500 && !discovery ? Math.max(.55, 1 - (1 - pose.zoom) * 1.2) : 1;
+  const distance = Math.max(EARTH_RADIUS + 5, fit * pose.zoom * detail);
   const normal = geographicPoint(pose.lat, pose.lon, 1);
   const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), normal).normalize();
   const up = new THREE.Vector3().crossVectors(normal, right).normalize();

@@ -10,7 +10,7 @@ export const continents = [
   { id: 'antarctica', name: 'Antarctica', lat: -82, lon: 0 },
 ];
 export const earthRegions = {
-  asia: { title: 'Asia', lat: 22, lon: 105, zoom: .7, sites: ['merapi', 'himalayas', 'borneo'] },
+  asia: { title: 'Asia', eyebrow: 'MOUNTAINS, FORESTS & VOLCANOES', lat: 22, lon: 105, zoom: .7, sites: ['merapi', 'himalayas', 'borneo'] },
 };
 export const earthSites = {
   merapi: { title: 'Mount Merapi', region: 'asia', lat: -7.54, lon: 110.446, zoom: .65 },

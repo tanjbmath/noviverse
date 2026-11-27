@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { icon } from './icons.js';
+import { earthRegions } from '../data/earth.js';
 import { discoveries, sources } from '../data/discoveries.js';
 
 export class Interface {
@@ -38,7 +39,7 @@ export class Interface {
         <button class="text-button" data-action="back" id="earth-back">${icon('back')} Back to space</button>
         <p class="eyebrow" id="earth-eyebrow">OUR LIVING PLANET</p>
         <h1 id="earth-title">Hello, Earth.</h1>
-        <p>Drag, swipe or scroll to turn.<br>Tap a glowing node to explore.</p>
+        <p>Drag, swipe or scroll to turn.<br>Pinch to zoom. Tap a node to explore.</p>
       </section>
       <nav id="earth-controls" class="earth-controls" aria-label="Globe navigation" hidden>
         <span class="sr-only">Turn the globe, zoom, or reset the current view.</span>
@@ -104,10 +105,11 @@ export class Interface {
     this.hideDiscovery();
   }
   earthRegion(region) {
-    this.elements['earth-title'].textContent = region === 'asia' ? 'Hello, Asia.' : 'Hello, Earth.';
-    this.elements['earth-eyebrow'].textContent = region === 'asia' ? 'MOUNTAINS, FORESTS & VOLCANOES' : 'OUR LIVING PLANET';
+    this.earthRegionId = region;
+    this.elements['earth-title'].textContent = region ? `Hello, ${earthRegions[region].title}.` : 'Hello, Earth.';
+    this.elements['earth-eyebrow'].textContent = earthRegions[region]?.eyebrow || 'OUR LIVING PLANET';
     this.elements['earth-back'].innerHTML = `${icon('back')}${region ? 'Earth overview' : 'Back to space'}`;
-    this.elements['location-chip'].textContent = region ? 'EARTH · ASIA' : 'EARTH · GLOBE EXPLORER';
+    this.elements['location-chip'].textContent = region ? `EARTH · ${earthRegions[region].title.toUpperCase()}` : 'EARTH · GLOBE EXPLORER';
   }
   project(engine) {
     if (!this.labels) return;
@@ -129,7 +131,7 @@ export class Interface {
       ${d.activity ? `<button class="primary activity-button" data-action="activity">${icon('lab')}${d.activityTitle}</button>` : d === discoveries.earth ? '<span class="expansion">MORE ENVIRONMENTS · FUTURE EXPANSION</span>' : ''}
       <details><summary>A closer look</summary><p>${d.detail}</p></details>
       <details><summary>Science sources</summary><ul>${d.sourceIds.map(id => `<li><a href="${sources[id][1]}" target="_blank" rel="noopener noreferrer">${sources[id][0]}</a></li>`).join('')}</ul><small>Checked 27 November 2026</small></details>
-      <button class="text-button" data-action="back">${icon('back')}${this.kind === 'moon' ? 'Lunar overview' : this.kind === 'sun' ? 'Solar overview' : this.kind === 'earth' ? 'Asia overview' : 'Back to space'}</button>`;
+      <button class="text-button" data-action="back">${icon('back')}${this.kind === 'moon' ? 'Lunar overview' : this.kind === 'sun' ? 'Solar overview' : this.kind === 'earth' ? `${earthRegions[this.earthRegionId]?.title || 'Earth'} overview` : 'Back to space'}</button>`;
     this.elements.discovery.hidden = false;
     document.body.classList.add('discovering');
     this.elements.discovery.querySelector('h2').focus({ preventScroll: true });
