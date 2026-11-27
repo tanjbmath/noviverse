@@ -42,3 +42,11 @@ Local Chromium-based in-app browser, default 1280×720 and emulated 390×844, 36
 - No physical mobile, touch hardware, screen-reader audit, GPU memory stress test or measured FPS/thermal benchmarks. Pointer/pinch cancellation and cleanup are tested with simulated events.
 - WebGL context-loss messaging exists but a forced GPU-loss recovery was not tested. Texture failure cleanup is implemented; no intentional network-failure browser test was run.
 - Static output is ready locally. Publication and remote CI were not performed.
+
+## Deployment preparation and travel notice fix
+
+The large lower-centre travel board was replaced with a one-line upper-edge status pill. It uses `pointer-events: none`; journey text is still announced through the existing screen-reader status region. The notice hides on arrival, and the Home control remains available throughout travel. Old desktop/mobile positioning overrides were removed.
+
+Production-browser checks exercised animated Saturn and Earth journeys at 1280×720 and 390×844. The notice measured approximately 170×39 px and 166×37 px respectively, with no centre-screen board, no captured console warnings/errors, and no click interception. Arrival hid the notice. All 23 tests, asset verification, and the production build passed again.
+
+The remote was fetched before release preparation; `origin/main` remains at the original `0887427` baseline, so there are no new main-branch changes to reconcile. The release includes the generated root site, `dist/`, and a verified static ZIP with a SHA-256 checksum in the ignored `releases/` folder. The ZIP is named after its source commit and contains `index.html` at its root. No branch push, merge or live deployment was requested or performed.

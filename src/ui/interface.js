@@ -65,7 +65,7 @@ export class Interface {
       <aside class="novi-message" id="novi-message"><span class="mini-face" aria-hidden="true"><i></i><i></i></span><p><strong>Your co-pilot, Novi</strong><span>Small explorer. Endless questions.</span></p></aside>
       <aside id="discovery" class="discovery" aria-label="Science discovery" hidden></aside>
       <footer class="field-note" id="field-note">A playful universe. Real science. <span>Sizes & distances are not to scale.</span></footer>
-      <div id="travel" class="travel" hidden><div class="travel-line"></div><span class="eyebrow">NOVI IS ON THE WAY</span><p id="travel-text" role="status">Getting our spacecraft ready…</p><small>Home is always available to return to space.</small></div>
+      <div id="travel" class="travel" hidden aria-hidden="true"><span class="travel-line"></span><span class="travel-label">Novi is on the way</span><span id="travel-text" class="sr-only"></span></div>
       <div id="status" class="sr-only" role="status" aria-live="polite"></div>
       <dialog id="modal" aria-labelledby="modal-title"><button class="close tool" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button><div id="modal-body"></div></dialog>
     `);

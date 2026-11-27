@@ -2,6 +2,16 @@
 
 The repository is https://github.com/tanjbmath/noviverse. It includes editable source and a generated static copy at the repository root. `npm run build` refreshes both `dist/` and this root copy.
 
+## Prepared Phase 1 release
+
+The local branch `codex/noviverse-phase-1` contains the revamp and the compact travel notice fix. The build is ready in `dist/`; a verified upload ZIP and SHA-256 checksum are provided in the ignored `releases/` folder, named with the release commit. The ZIP opens directly to `index.html` and its assets, without an extra enclosing directory. It contains compiled static files and bundled imagery, with no dependency installation or backend configuration needed on the host.
+
+For a static host with an upload option, upload the ZIP or extract its contents into the host's web root. For the existing GitHub Pages branch publishing route, push the implementation branch and merge its committed source plus generated root files into `main`; publication then follows the repository's Pages configuration. The optional manual Actions workflow below is a separate route and requires Pages to use GitHub Actions.
+
+Local checks passed: all 23 tests, image provenance/hash verification, production build, and relative entry/asset validation for root hosting and `/noviverse/`. The production preview was checked during animated desktop and phone flights. The notice is a non-interactive pill approximately 170×39 px on desktop and 166×37 px on a phone, at the upper edge of the screen; detailed journey announcements remain available to assistive technology.
+
+Preparation does not publish the site. No branch push, merge, remote workflow run or deployment was performed for this release. GitHub account-level Pages settings and physical-phone performance have not been verified. The existing Three.js bundle-size advisory remains.
+
 ## Current branch-based Pages setup
 
 Pages can publish **main / (root)** directly. The tracked root `index.html`, `assets/`, `textures/`, and `.nojekyll` are already built and work under `/noviverse/`. Updating those files triggers the repository's existing Pages deployment. Edit `src/index.html` for HTML changes, then run `npm run build` and commit the updated source and generated root files together.
