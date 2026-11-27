@@ -10,6 +10,7 @@ let engine, world, operation = new AbortController(), busy = true, reduced = mat
 const ui = new Interface(app, {
   destination: id => destination(id), poi: id => inspect(id), home: () => home(), back: () => back(),
   motion: () => { reduced = !reduced; applyMotion(); },
+  earthControl: action => { if (!busy && world?.kind === 'earth' && !ui.activeDiscovery) world.navigateControl(action); },
   activity: async id => {
     const module = await import('./ui/activities.js');
     if (id === 'gravity') module.gravityActivity(ui);
@@ -29,10 +30,10 @@ const duration = seconds => reduced ? 0.08 : seconds;
 function begin(text) {
   operation.abort(); operation = new AbortController(); busy = true;
   ui.closeModal(); ui.hideDiscovery(); ui.setBusy(true, text);
-  if (world) { world.novi.setScanning(false); world.setIdle?.(false); }
+  if (world) { world.novi.setScanning(false); world.setIdle?.(false); world.setInteractive?.(false); }
   return operation.signal;
 }
-function settle() { busy = false; ui.setBusy(false); world?.novi.setMoving(false); }
+function settle() { busy = false; ui.setBusy(false); world?.novi.setMoving(false); world?.setInteractive?.(true); }
 function swap(next) {
   const old = world;
   world = next; engine.use(next); ui.world(next.kind, next.labels);
@@ -83,17 +84,17 @@ async function destination(id) {
       swap(result.value); settle(); ui.status('Welcome to the solar observatory. Tap a glowing node to investigate our star.'); return;
     }
     if (id === 'earth') {
-      const object = world[id];
-      const mobile = innerWidth < 760;
-      const destinationCamera = mobile
-        ? object.position.clone().add(new THREE.Vector3(0, 0, 19))
-        : new THREE.Vector3(1, 1, 10.5);
-      const shipFrom = world.novi.root.position.clone();
-      const shipTo = object.position.clone().add(new THREE.Vector3(-3.4, -1.8, 4));
-      const flight = engine.animate(duration(2), t => { world.novi.root.position.lerpVectors(shipFrom, shipTo, t); }, signal);
-      const introLook = object.position.clone().add(new THREE.Vector3(0, mobile ? -3.3 : 0, 0));
-      await engine.view(destinationCamera, introLook, duration(2), signal); await flight;
-      if (signal.aborted) return; settle(); ui.showDiscovery(id); return;
+      const nextPromise = import('./scenes/earth.js').then(m => m.createEarth(engine)).then(value => ({ value }), error => ({ error }));
+      const object = world.earth, from = world.novi.root.position.clone();
+      const to = object.position.clone().add(new THREE.Vector3(-2, -1, 5));
+      const flight = engine.animate(duration(2.2), t => world.novi.root.position.lerpVectors(from, to, t), signal);
+      await engine.view(object.position.clone().add(new THREE.Vector3(0, 0, 10)), object.position.clone(), duration(2.2), signal);
+      await flight;
+      const result = await nextPromise;
+      if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
+      if (result.error) throw result.error;
+      swap(result.value); ui.earthRegion(null); settle();
+      ui.status('Welcome to Earth. Drag, swipe or scroll to turn the globe. Tap a glowing node to explore the first continent.'); return;
     }
     const nextPromise = import('./scenes/moon.js').then(m => m.createMoon(engine)).then(value => ({ value }), error => ({ error }));
     const shipFrom = world.novi.root.position.clone(), shipTo = world.moon.position.clone().add(new THREE.Vector3(0, 0, 1.4));
@@ -122,6 +123,18 @@ async function destination(id) {
 }
 
 async function inspect(id) {
+  if (world?.kind === 'earth') {
+    if (busy || !world.labels.some(label => label.id === id)) return;
+    const signal = begin('Novi is following a new Earth discovery…');
+    try {
+      world.novi.setMoving(true);
+      if (!await world.focus(id, engine, duration(1.7), signal)) return;
+      ui.world('earth', world.labels); ui.earthRegion(world.region); settle();
+      if (world.visiting) { world.novi.setScanning(true); ui.showDiscovery(id); }
+      else ui.status('Our next continent is ready. Explore a glowing node, or turn the globe to look around.');
+    } catch (error) { if (!signal.aborted) report(error); }
+    return;
+  }
   if (busy || !['moon', 'sun'].includes(world?.kind) || !world.labels.some(label => label.id === id)) return;
   const signal = begin(`Novi is heading to ${discoveries[id].title}…`);
   world.visiting = true; world.novi.setMoving(true);
@@ -161,6 +174,16 @@ async function inspect(id) {
 
 async function back() {
   if (busy) return;
+  if (world?.kind === 'earth') {
+    if (!world.region) { await home(); return; }
+    const target = world.visiting ? world.region : 'globe';
+    const signal = begin(target === 'globe' ? 'Returning to our Earth overview…' : 'Returning to the continent overview…');
+    try {
+      if (!await world.focus(target, engine, duration(1.2), signal)) return;
+      ui.world('earth', world.labels); ui.earthRegion(world.region); settle();
+    } catch (error) { if (!signal.aborted) report(error); }
+    return;
+  }
   if (world?.kind === 'sun') {
     const signal = begin('Returning to our solar viewing point…');
     const view = world.view(), from = world.novi.root.position.clone();

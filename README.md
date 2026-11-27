@@ -1,6 +1,6 @@
 # NoviVerse
 
-An initial playable, static Three.js science adventure. Every visit starts in space. Tap a world or point of interest; Novi navigates automatically. No movement controls, accounts, saving, database, Firebase, analytics, or external runtime API.
+An initial playable, static Three.js science adventure. Every visit starts in space. Tap a world or point of interest; Novi navigates automatically. Novi navigates automatically; the Earth globe has direct camera controls. No accounts, saving, database, Firebase, analytics, or external runtime API.
 
 ## Run locally
 
@@ -35,7 +35,7 @@ npm run preview
 - An ideal gravity experiment with two different masses on both worlds; tap plus/minus to set 1–20 m drop height, then compare timed drops.
 - An impact-energy experiment with 5, 10, and 20 km/s choices, calculated kinetic energy, and a deliberately qualitative crater animation.
 - A solar observatory reached by tapping the Sun: animated granular plasma, dark sunspot groups, luminous prominence strands, and a streaming corona. Four unlabeled nodes reveal NASA-linked science about the photosphere, sunspots, prominences and corona, with a replayable three-question Sun detective activity. Novi remains a spacecraft; there is no solar landing.
-- Earth has an accessible orbital introduction. Its future surface environments are explicitly labeled as future expansion.
+- Tapping Earth opens a turnable NASA-textured globe with all seven continents visible. Drag/swipe or scroll to turn; pinch or Shift/Ctrl-scroll to zoom. Accessible turn/zoom/reset buttons provide a pointer-independent alternative. The first available continent is Asia, with geographically anchored Merapi, Himalayas and Borneo science stops. Back returns from a stop to Asia, then to the globe; Home returns to space. Walking environments and underground exploration remain future work.
 - Responsive 390 px phone and desktop layouts, unlabeled glowing HTML nodes for all raycast targets, with 44 px touch areas, native modal focus management, accessible names, and a Reduce Motion toggle. System reduced-motion preference is respected on initial load. Keyboard activation of buttons works; there are no keyboard movement controls.
 
 ## Structure
@@ -47,11 +47,14 @@ src/core/engine.js          Renderer, frame loop, raycasting, camera tweening
 src/core/assets.js          Local texture loader and procedural microtexture
 src/core/dispose.js         Deduplicated GPU-resource disposal
 src/core/math.js            Deterministic art helpers and experiment physics
+src/core/globe-controls.js  Pointer, wheel and pinch camera controls with tap/drag separation
 src/models/novi.js          Original multi-part character/craft rig and animation
 src/models/sun.js           Shared plasma, sunspot, prominence and additive glare shaders/meshes
 src/scenes/space.js         Space scene and responsive planet composition
 src/scenes/moon.js          On-demand lunar diorama and POIs
 src/scenes/sun.js           On-demand solar observatory and responsive discovery views
+src/scenes/earth.js         On-demand globe, geographic nodes and continent/site views
+src/data/earth.js           Expandable continent and location registry
 src/scenes/shared.js        Starfield, atmosphere and beacons
 src/data/discoveries.js     Source-linked science records and POI definitions
 src/ui/interface.js         Accessible HUD, panels and dialogs
@@ -66,6 +69,8 @@ scripts/verify-site.mjs      Guards against publishing the unbuilt Vite HTML ent
 ```
 
 The Moon scene is dynamically imported at destination selection; its terrain, rock textures, and meshes are constructed on demand. Experiments are imported only when opened. Earth/Moon overview maps are needed at startup to display those visible worlds. Assets are disposed when changing scenes; repeat visits reconstruct them. The single Three.js renderer is reused.
+
+Earth expansion: enable a continent in `src/data/earth.js`, add its region and location records, then add the matching source-linked discoveries in `src/data/discoveries.js`. Names are revealed after selection; rear-side nodes are hidden and blocked by the globe. Broad-region anchors are representative; Merapi uses Smithsonian coordinates. Geography is aligned to the existing equirectangular map, with no political boundary layer or live land-cover claim.
 
 To add a discovery, create a source-linked data record and add a target mesh and node anchor in its scene. Nodes keep accessible names for screen readers; visible names and facts appear after selection. To add a world, give it the scene contract used by `createSpace`/`createMoon`: `scene`, `kind`, `novi`, `targets`, `labels`, `resize`, and `update`; import it on demand in navigation.
 

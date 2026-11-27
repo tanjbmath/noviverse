@@ -82,3 +82,18 @@ The Sun now uses a shared, authored plasma shader and additive billboard glare/r
 - The managed preview opened in Chromium, but the browser reports `GL_RENDERER = Disabled` and cannot create a WebGL context. One reload confirmed the same failure. Shader execution, rendered glare quality, animation smoothness, visual layering and physical-device behavior remain unverified. No browser/GPU rendering success is claimed for this update.
 
 The earlier “Earth and Sun are introductory experiences” limitation above applies to the original release. Earth remains introductory; Sun now has the solar observatory described here. The solar scene is an authored illustration, not real solar imagery or a safe real spacecraft mission design.
+
+
+## Earth globe and first continent — 27 November 2026
+
+Implemented a separate, on-demand Earth globe using the existing credited NASA texture. All seven continents can be viewed by turning the globe. Asia is initially available through an unnamed node; selecting it reveals geographically anchored Merapi, Himalayas and Borneo discoveries. Drag/swipe and ordinary wheel scrolling turn the view; pinch and Shift/Ctrl-wheel zoom. Accessible turn/zoom/reset buttons provide equivalent camera operations. Swipes/pinches suppress destination picking, rear-side nodes are hidden and blocked by Earth, travel/discovery locks camera gestures, and leaving the scene removes all gesture listeners and capture state. Back returns site → continent → globe → space. The data registry supports additional continent destinations.
+
+Validation ran on GitHub Actions because the local execution workspace was unavailable. [Successful validation/build run](https://github.com/tanjbmath/noviverse/actions/runs/45993448592) tested source commit ab3beb4d9df9c65826464459e1e0b54f090e787d and produced static-build commit 07b03132bbcb35e10e365f487db94217beb1959f on the feature branch.
+
+- All 17 Node tests passed. Four Earth checks cover gesture sequences (tap/drag/pinch/wheel/cancel/disabled/disposal), coordinate mapping and far-side occlusion, seven desktop/phone/landscape sizes and 44 px separation between initial Asia nodes, scene navigation/cancellation and cleanup. Existing Moon orbit, Sun, rig, resource-disposal and science checks pass.
+- Asset hashes passed. The Vite production build, root static copy and root/dist repository-subpath checks passed. The existing Three.js size advisory remains. No new dependencies, texture files, backend calls or runtime external API were added.
+- A short landscape test initially found overlapping Asia touch areas; the continent framing was corrected before the passing run.
+- These are model, synthetic-input and camera-projection checks. Rendered browser behavior, full UI integration, actual touch hardware and visual texture alignment were not tested in this update. No WebGL/browser validation is claimed.
+- This phase adds globe-based science introductions. Walking terrain, rainforest/volcano environments, underground cutaways, other continent discoveries and new Earth mini-games remain future work. Broad-region coordinates are representative, not surveyed boundaries; Merapi uses the catalog location. Imagery is historical rather than live.
+
+A temporary workflow used for feature-branch validation/packaging was removed before merge. The existing production deployment configuration is preserved.

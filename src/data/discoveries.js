@@ -1,6 +1,9 @@
 // Facts checked 2026-11-27 against the primary sources linked in every entry.
 // Values use the default USGS control network. Alternate networks differ slightly.
 export const sources = {
+  merapi: ['Smithsonian GVP · Merapi', 'https://volcano.si.edu/volcano.cfm?vn=263250'],
+  himalayas: ['USGS · The Himalayas', 'https://pubs.usgs.gov/gip/dynamic/himalaya.html'],
+  borneo: ['UNESCO · Kinabatangan, Borneo', 'https://www.unesco.org/en/mab/kinabatangan'],
   tycho: ['USGS / IAU · Tycho', 'https://planetarynames.wr.usgs.gov/Feature/6163'],
   tychoA: ['USGS / IAU · Tycho A', 'https://planetarynames.wr.usgs.gov/Feature/13551'],
   craters: ['NASA · Lunar craters', 'https://science.nasa.gov/moon/lunar-craters/'],
@@ -14,6 +17,30 @@ export const sources = {
 };
 
 export const discoveries = {
+  merapi: {
+    title: 'Mount Merapi', category: 'ASIA · JAVA, INDONESIA', icon: 'earth',
+    stats: [['7.54° S', 'latitude'], ['110.446° E', 'longitude']],
+    explanation: 'Merapi is an active volcano on the island of Java. It is a stratovolcano: a mountain built by repeated volcanic activity. Thick lava can collect near its summit and form a lava dome.',
+    fact: 'Molten rock below ground is called magma. When it reaches the surface, we call it lava.',
+    detail: 'This globe stop uses the Smithsonian Global Volcanism Program coordinates. It introduces a real volcanic location; a walkable volcanic environment and an underground cutaway can be added here later. This is educational geography, not a live eruption map or a guide to visiting the volcano.',
+    sourceIds: ['merapi'],
+  },
+  himalayas: {
+    title: 'The Himalayas', category: 'ASIA · A CONTINENTAL COLLISION', icon: 'earth',
+    stats: [['Plate collision', 'mountain building'], ['Rock layers', 'folded and uplifted']],
+    explanation: 'The Indian and Eurasian tectonic plates have collided. The collision compresses and thickens Earth’s crust, helping build the Himalayas. Mountains can form through plate collision as well as volcanic activity.',
+    fact: 'Earth’s crust moves so slowly that the motion is hard to notice in daily life, yet it can build enormous mountain ranges over geological time.',
+    detail: 'This node marks a representative part of the Himalayan region, not the boundary or summit of a surveyed mountain. The globe is historical satellite imagery. The source explains the plate-collision mechanism; no exact current uplift rate or disputed formation date is used here.',
+    sourceIds: ['himalayas'],
+  },
+  borneo: {
+    title: 'Borneo’s rainforests', category: 'ASIA · A CONNECTED LIVING SYSTEM', icon: 'earth',
+    stats: [['Forests & rivers', 'connected habitats'], ['Biodiversity', 'many forms of life']],
+    explanation: 'Borneo’s forests, rivers and wetlands provide connected habitats for many kinds of plants and animals. In the Kinabatangan region, river systems connect mountainous headwaters with lowland wetlands.',
+    fact: 'Protecting a habitat means protecting connections too: animals, plants, water and people all depend on the surrounding landscape.',
+    detail: 'The node is a representative northeastern Borneo location near the Kinabatangan region, not a surveyed boundary or a claim about present-day forest cover at one exact pixel. UNESCO describes this region’s linked forests, river habitats and biodiversity. A forest exploration environment can be added at this stop later.',
+    sourceIds: ['borneo'],
+  },
   tycho: {
     title: 'Tycho crater', category: 'AN IMPACT, FROZEN IN TIME', icon: 'crater',
     short: 'Tycho crater', position: [0, 0, 0], stop: [-2.8, 0, 6.8],

@@ -17,3 +17,13 @@ Reviewed 27 November 2026. Child-facing explanations are original paraphrases of
 | Lunar environment / fictional craft | [NASA, Moon facts](https://science.nasa.gov/moon/facts/): rocky surface and very thin exosphere. Downward rocket thrust can operate in vacuum; Novi's compact transforming craft, instant scanner and travel times are fictional. |
 
 Keep new content in local data modules with a primary source, a checked date, and explicit model limitations. Do not present decorative local coordinates or procedural rock appearance as measured lunar observations.
+
+## Earth globe and Asia — 27 November 2026
+
+The globe reuses the credited NASA historical equirectangular map. All seven continents are visible as landforms. The available-continent registry initially enables Asia; turning the globe does not require a backend. Continent centers and broad-region anchors are representative, not political boundaries or surveyed visitor sites.
+
+- [Smithsonian Global Volcanism Program: Merapi](https://volcano.si.edu/volcano.cfm?vn=263250): an active stratovolcano on Java; the node uses 7.54° S, 110.446° E. Dome-forming behavior is described generally. No live activity or alert level is displayed.
+- [USGS: The Himalayas](https://pubs.usgs.gov/gip/dynamic/himalaya.html): the India–Eurasia collision compresses/thickens crust and builds mountains. No exact onset date or current uplift rate is asserted. The node at 28° N, 86.9° E represents part of the range.
+- [UNESCO: Kinabatangan](https://www.unesco.org/en/mab/kinabatangan): linked forest/river/wetland habitats and biodiversity in northeastern Borneo. The 5.4° N, 117.9° E anchor is representative, not a surveyed reserve boundary or a present-day land-cover claim.
+
+This phase provides globe-based location discoveries. Volcanic terrain, walking, rainforest environments and underground cutaways are not implemented or implied by the introductory panels.
