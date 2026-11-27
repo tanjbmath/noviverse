@@ -4,16 +4,18 @@ import * as THREE from 'three';
 import { createNovi } from '../src/models/novi.js';
 import { disposeScene } from '../src/core/dispose.js';
 
-test('one detailed Novi rig transforms continuously into hover mode', () => {
+test('Novi remains a living rocket with visible cockpit, fins, thruster and scanning equipment', () => {
   const novi = createNovi();
   const scene = new THREE.Scene(); scene.add(novi.root);
   const port = novi.root.getObjectByName('Port engine pivot');
   const starboard = novi.root.getObjectByName('Starboard engine pivot');
   assert.ok(port && starboard);
+  for (const name of ['Rounded ivory fuselage', 'Expressive blue cockpit', 'Novi eyes', 'Coral swept fin', 'Ignited thruster', 'Exhaust particles']) assert.ok(novi.root.getObjectByName(name), name);
   for (const t of [0, 0.25, 0.5, 0.75, 1]) {
     novi.setTransform(t); novi.setMoving(true); novi.setScanning(true); novi.update(3);
-    assert.equal(port.rotation.x, -t * Math.PI / 2);
-    assert.equal(starboard.rotation.x, -t * Math.PI / 2);
+    assert.equal(port.rotation.x, 0);
+    assert.equal(starboard.rotation.x, 0);
+    assert.equal(novi.root.getObjectByName('Scanning ring').visible, true);
     scene.updateMatrixWorld(true);
     scene.traverse(object => assert.ok(object.matrixWorld.elements.every(Number.isFinite)));
   }

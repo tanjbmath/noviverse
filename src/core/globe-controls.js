@@ -73,6 +73,7 @@ export class GlobeControls {
     listen('wheel', e => {
       if (!this.enabled) return;
       e.preventDefault();
+      if (this.wheel) { this.wheel(e); return; }
       const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 300 : 1;
       const dx = clamp(e.deltaX * unit, -120, 120), dy = clamp(e.deltaY * unit, -120, 120);
       if (e.ctrlKey || e.shiftKey) this.zoom(Math.exp(dy * .002));

@@ -7,24 +7,22 @@ import { discoveries, sources } from '../src/data/discoveries.js';
 import { createWonder, artworkPoint, wonderView } from '../src/scenes/wonder.js';
 import { disposeScene } from '../src/core/dispose.js';
 
-test('Novi unfolds into a walking explorer and restores the original spacecraft', () => {
+test('deferred geography compatibility hooks preserve the new rocket form', () => {
   const novi = createNovi(), scene = new THREE.Scene(); scene.add(novi.root);
   novi.update(0, true, 0);
   const hull = novi.root.children[0], original = new THREE.Box3().setFromObject(novi.root);
-  const ground = novi.root.getObjectByName('Earth walking rig');
-  assert.equal(ground.visible, false);
+  assert.equal(novi.root.getObjectByName('Earth walking rig'), undefined);
   for (const mode of [0, .25, .5, .75, 1, .5, 0]) {
     novi.setEarthMode(mode); novi.setMoving(true); novi.update(2, false, .016);
-    assert.equal(novi.earthMode, mode);
+    assert.equal(novi.earthMode, 0);
     scene.updateMatrixWorld(true); scene.traverse(o => assert.ok(o.matrixWorld.elements.every(Number.isFinite)));
   }
   novi.setMoving(false); novi.update(0, true, 0);
   const restored = new THREE.Box3().setFromObject(novi.root);
   assert.ok(original.min.distanceTo(restored.min) < 1e-10); assert.ok(original.max.distanceTo(restored.max) < 1e-10);
   novi.setEarthMode(1); novi.setMoving(true); novi.update(.2, false, .016);
-  assert.equal(ground.visible, true); assert.ok(Math.abs(ground.children[0].rotation.x) > .1);
   const root = novi.root.position.clone(); novi.update(5, true, 0);
-  assert.equal(ground.children[0].rotation.x, 0); assert.equal(hull.position.y, 0); assert.ok(novi.root.position.equals(root));
+  assert.equal(hull.position.y, 0); assert.ok(novi.root.position.equals(root));
   disposeScene(scene);
 });
 

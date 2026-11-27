@@ -53,3 +53,58 @@ body[data-world=wonder] .vignette{background:linear-gradient(90deg,#06131c80,tra
 .wonder-challenge-art .found .target-dot{background:#ffe4a0}
 @media(max-width:759px){.wonder-intro{top:84px;left:22px;right:22px;max-width:none}.wonder-intro h1{font-size:24px;line-height:1.2}.wonder-intro .text-button{margin:0 0 2px}.wonder-intro p:last-of-type{display:none}.wonder-intro .primary{margin-top:9px;font-size:.8125rem;padding:8px 12px;min-height:44px}}
 @media(min-width:760px) and (max-height:499px){.wonder-intro{top:95px;max-width:260px}.wonder-intro h1{font-size:24px}.wonder-intro p:last-of-type{display:none}.wonder-intro .primary{margin-top:10px}}
+/* Phase 1: the universe occupies the full viewport; information arrives on discovery. */
+body[data-world=space]{--mint:#99e4dc;background:#100e25}
+body[data-world=space] #universe{touch-action:none}
+body[data-world=space] .vignette{background:linear-gradient(0deg,#100e25b0,transparent 18%),linear-gradient(180deg,#100e2570,transparent 23%)}
+body[data-world=space] .space-intro{left:46px;top:116px;max-width:600px}
+body[data-world=space] .space-intro .eyebrow{font-size:.8rem;margin-bottom:12px;letter-spacing:2.5px;color:#c3b1da}
+body[data-world=space] .space-intro h1{font-size:clamp(1.8rem,3vw,2.8rem);letter-spacing:-1.7px;line-height:1.2}
+body[data-world=space] .intro-copy{font-size:1rem;margin:10px 0;color:#aaa6c5}
+body[data-world=space] .novi-message{left:46px;bottom:106px}
+body[data-world=space] .novi-message strong{font-size:.9rem;color:#f8e8cc}
+body[data-world=space] .novi-message p span{font-size:.85rem;color:#b2a9c8}
+body[data-world=space] .mini-face{border-color:#ffe8c7;background:#15386a}
+body[data-world=space] .field-note{font-size:.8rem;color:#c7bdd6;bottom:14px}
+body[data-world=space] .field-note span{color:#aba2bc}
+body[data-world=space] .discovery{background:linear-gradient(145deg,#27213bf5,#14182bf5);border-color:#ac9fc342;top:112px;bottom:106px}
+body[data-world=space] .discovery .eyebrow{font-size:.75rem;letter-spacing:1.5px;margin:0}
+body[data-world=space] .stats{display:grid;grid-template-columns:1fr;gap:13px}
+body[data-world=space] .stats>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+body[data-world=space] .stats strong{font-size:1rem}
+body[data-world=space] .stats small{font-size:.8rem;margin:0;text-align:right}
+body[data-world=space] .discovery>p{font-size:1rem}
+body[data-world=space] .wonder p{font-size:1rem;line-height:1.6}
+body[data-world=space] .discovery h2{font-size:2.2rem;color:#fff0dc}
+body[data-world=space] .travel{bottom:80px}
+.explorer-menu{padding:10px 18px;border-radius:24px;background:#a1e1d9;color:#102b36;font-size:.9rem;min-height:44px;font-weight:650}
+body:not([data-world=space]) .explorer-menu{display:none}
+.space-tools{position:fixed;z-index:5;bottom:51px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;white-space:nowrap;background:#18172cdd;border:1px solid #b6a6d32b;padding:5px 8px 5px 18px;border-radius:32px;backdrop-filter:blur(12px)}
+.space-tools span{font-size:.85rem;color:#c1b8d0;margin-right:14px}
+.space-tools button{background:#c1adf015;border:1px solid #c1adf025;min-width:44px;min-height:44px;border-radius:23px;font-size:1rem;padding:6px 12px}
+.space-tools button:last-child{font-size:.85rem}
+.travelling .space-tools{display:none}
+.destination-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.destination-grid button{position:relative;text-align:left;border:1px solid #bca8d333;border-radius:13px;background:#cec2e40b;padding:14px 12px 14px 45px;font-size:1rem;min-height:72px}
+.destination-grid button i{position:absolute;left:15px;top:26px;width:18px;height:18px;border-radius:50%;background:var(--planet-color);box-shadow:inset -5px -3px 5px #0004}
+.destination-grid small{display:block;font-size:.8rem;color:#b2abc5;line-height:1.5;margin-top:3px}
+.brand small{font-size:.65rem;letter-spacing:1.7px}
+.location-chip{font-size:.8rem;letter-spacing:1.2px}
+@media(max-width:1000px){body[data-world=space] .space-intro{left:28px}.space-tools span{display:none}.space-tools{padding:5px 8px}}
+@media(max-width:759px){
+  .topbar{padding:16px}.brand small{display:none}.brand{font-size:1.25rem;gap:6px}.brand>.icon{width:24px;height:24px}
+  .utilities{gap:5px}.utilities .tool{width:36px;height:44px;min-height:44px}.explorer-menu{padding:8px 12px;font-size:.85rem}
+  body[data-world=space] .space-intro{top:88px;left:23px;right:20px}
+  body[data-world=space] .space-intro h1{font-size:1.9rem;letter-spacing:-1.1px}
+  body[data-world=space] .space-intro .eyebrow{font-size:.75rem;margin-bottom:10px}
+  body[data-world=space] .intro-copy{font-size:.9rem;margin-top:8px}
+  body[data-world=space] .field-note{font-size:.75rem;bottom:8px;line-height:1.5;padding:0 12px}
+  body[data-world=space] .field-note span{display:block}
+  .space-tools{bottom:57px}
+  body[data-world=space] .discovery{top:auto;bottom:112px;height:43dvh;left:12px;right:12px;padding:19px 22px}
+  body[data-world=space] .discovery h2{font-size:1.8rem;margin-bottom:15px}
+  body[data-world=space] .travel{bottom:112px}
+  .destination-grid button{padding-left:38px}.destination-grid button i{left:12px;width:15px;height:15px}
+}
+@media(max-height:500px){body[data-world=space] .space-intro{top:78px}body[data-world=space] .intro-copy{display:none}body[data-world=space] .space-intro h1{font-size:1.7rem}body[data-world=space] .space-intro .eyebrow{display:none}body[data-world=space] .discovery{top:78px;bottom:105px;height:auto}body[data-world=space] .novi-message{display:none}.space-tools{bottom:50px}}
+body[data-world=space] .explore-node::before{content:"";position:absolute;left:50%;top:50%;width:var(--leader-length,0px);height:1px;background:#99e4dc55;transform-origin:left;transform:rotate(var(--leader-angle,0rad));pointer-events:none;z-index:-1}

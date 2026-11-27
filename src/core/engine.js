@@ -4,7 +4,8 @@ import { smooth } from './math.js';
 export class Engine {
   constructor(container, onPick) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+    this.pixelCap = innerWidth < 760 ? 1.35 : 1.75;
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, this.pixelCap));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.2;
@@ -21,6 +22,8 @@ export class Engine {
     this.time = 0;
     this.last = performance.now();
     this.resize = () => {
+      this.pixelCap = innerWidth < 760 ? 1.35 : 1.75;
+      this.renderer.setPixelRatio(Math.min(devicePixelRatio, this.pixelCap));
       this.renderer.setSize(innerWidth, innerHeight);
       this.camera.aspect = innerWidth / innerHeight;
       this.camera.updateProjectionMatrix();
@@ -49,6 +52,7 @@ export class Engine {
   frame(now) {
     const dt = Math.min((now - this.last) / 1000, 0.05);
     this.last = now;
+    this.frameDelta = dt;
     if (document.hidden) return;
     if (!this.paused) this.time += dt;
     for (const tween of [...this.tweens]) tween(dt);
