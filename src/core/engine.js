@@ -37,7 +37,7 @@ export class Engine {
       while (node && !node.userData.poi) node = node.parent;
       return node?.userData.poi;
     };
-    this.renderer.domElement.addEventListener('pointerup', e => { const id = cast(e); if (id) onPick(id); });
+    this.renderer.domElement.addEventListener('pointerup', e => { if (this.current?.controls && !this.current.controls.canPick(e)) return; const id = cast(e); if (id) onPick(id); });
     this.renderer.domElement.addEventListener('pointermove', e => {
       this.renderer.domElement.style.cursor = cast(e) ? 'pointer' : 'default';
     });
@@ -58,8 +58,10 @@ export class Engine {
     this.onFrame?.();
   }
   use(world) {
+    this.current?.deactivate?.();
     this.current = world;
     this.resize();
+    world.activate?.(this);
   }
   animate(seconds, update, signal) {
     if (signal?.aborted) return Promise.resolve(false);

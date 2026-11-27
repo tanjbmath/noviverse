@@ -34,6 +34,22 @@ export class Interface {
         <h1>Hello, Sun.</h1>
         <p>A star full of surprises.<br>Tap a node. Let’s look closer.</p>
       </section>
+      <section class="moon-intro earth-intro" id="earth-intro" hidden>
+        <button class="text-button" data-action="back" id="earth-back">${icon('back')} Back to space</button>
+        <p class="eyebrow" id="earth-eyebrow">OUR LIVING PLANET</p>
+        <h1 id="earth-title">Hello, Earth.</h1>
+        <p>Drag, swipe or scroll to turn.<br>Tap a glowing node to explore.</p>
+      </section>
+      <nav id="earth-controls" class="earth-controls" aria-label="Globe navigation" hidden>
+        <span class="sr-only">Turn the globe, zoom, or reset the current view.</span>
+        <button data-earth-control="left" aria-label="Turn globe left">Left</button>
+        <button data-earth-control="right" aria-label="Turn globe right">Right</button>
+        <button data-earth-control="up" aria-label="Look farther north">North</button>
+        <button data-earth-control="down" aria-label="Look farther south">South</button>
+        <button data-earth-control="in" aria-label="Zoom into Earth">+</button>
+        <button data-earth-control="out" aria-label="Zoom out from Earth">−</button>
+        <button data-earth-control="reset" aria-label="Reset globe view">Reset view</button>
+      </nav>
       <div id="labels" class="labels" aria-label="Objects to explore"></div>
       <aside class="novi-message" id="novi-message"><span class="mini-face" aria-hidden="true"><i></i><i></i></span><p><strong>Your co-pilot, Novi</strong><span>Small explorer. Endless questions.</span></p></aside>
       <aside id="discovery" class="discovery" aria-label="Science discovery" hidden></aside>
@@ -44,6 +60,8 @@ export class Interface {
     `);
     this.elements = Object.fromEntries([...app.querySelectorAll('[id]')].map(el => [el.id, el]));
     app.addEventListener('click', event => {
+      const earthControl = event.target.closest('[data-earth-control]')?.dataset.earthControl;
+      if (earthControl) actions.earthControl?.(earthControl);
       const dest = event.target.closest('[data-destination]')?.dataset.destination;
       const poi = event.target.closest('[data-poi]')?.dataset.poi;
       const action = event.target.closest('[data-action]')?.dataset.action;
@@ -67,6 +85,7 @@ export class Interface {
     if (text) { this.elements['travel-text'].textContent = text; this.status(text); }
     document.querySelectorAll('[data-destination], [data-poi]').forEach(button => { button.disabled = busy; });
     document.body.classList.toggle('travelling', busy);
+    this.elements['earth-controls'].querySelectorAll('button').forEach(button => { button.disabled = busy; });
   }
   world(kind, labels) {
     this.kind = kind;
@@ -74,13 +93,21 @@ export class Interface {
     this.elements['space-intro'].hidden = kind !== 'space';
     this.elements['moon-intro'].hidden = kind !== 'moon';
     this.elements['sun-intro'].hidden = kind !== 'sun';
+    this.elements['earth-intro'].hidden = kind !== 'earth';
+    this.elements['earth-controls'].hidden = kind !== 'earth';
     this.elements['novi-message'].hidden = kind !== 'space';
-    this.elements['location-chip'].textContent = kind === 'space' ? 'SPACE EXPLORER' : kind === 'sun' ? 'SUN · SOLAR OBSERVATORY' : 'MOON · TYCHO REGION';
-    this.elements['field-note'].innerHTML = kind === 'space' ? 'A playful universe. Real science. <span>Sizes & distances are not to scale.</span>' : kind === 'sun' ? 'Illustrated solar view · Colors & activity are artistic. <span>Novi’s viewing position is fictional. Never look directly at the real Sun.</span>' : 'Artistic Tycho diorama · Novi’s hovercraft is fictional. <span>Geography & travel compressed. Rocks are representative.</span>';
+    this.elements['location-chip'].textContent = kind === 'space' ? 'SPACE EXPLORER' : kind === 'sun' ? 'SUN · SOLAR OBSERVATORY' : kind === 'earth' ? 'EARTH · GLOBE EXPLORER' : 'MOON · TYCHO REGION';
+    this.elements['field-note'].innerHTML = kind === 'space' ? 'A playful universe. Real science. <span>Sizes & distances are not to scale.</span>' : kind === 'sun' ? 'Illustrated solar view · Colors & activity are artistic. <span>Novi’s viewing position is fictional. Never look directly at the real Sun.</span>' : kind === 'earth' ? 'NASA Earth imagery · Turn the globe to see the continents. <span>Asia is our first discovery region. Imagery is a historical composite.</span>' : 'Artistic Tycho diorama · Novi’s hovercraft is fictional. <span>Geography & travel compressed. Rocks are representative.</span>';
     this.labels = labels;
     this.elements.labels.innerHTML = labels.map(label => `<button class="explore-node" aria-label="Explore ${label.text}" data-${kind === 'space' ? 'destination' : 'poi'}="${label.id}"><span class="target-dot" aria-hidden="true"></span></button>`).join('');
     this.labelButtons = [...this.elements.labels.children];
     this.hideDiscovery();
+  }
+  earthRegion(region) {
+    this.elements['earth-title'].textContent = region === 'asia' ? 'Hello, Asia.' : 'Hello, Earth.';
+    this.elements['earth-eyebrow'].textContent = region === 'asia' ? 'MOUNTAINS, FORESTS & VOLCANOES' : 'OUR LIVING PLANET';
+    this.elements['earth-back'].innerHTML = `${icon('back')}${region ? 'Earth overview' : 'Back to space'}`;
+    this.elements['location-chip'].textContent = region ? 'EARTH · ASIA' : 'EARTH · GLOBE EXPLORER';
   }
   project(engine) {
     if (!this.labels) return;
@@ -89,7 +116,7 @@ export class Interface {
       const x = (this.scratch.x + 1) / 2 * innerWidth, y = (-this.scratch.y + 1) / 2 * innerHeight;
       const button = this.labelButtons[i];
       button.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%)`;
-      button.hidden = this.busy || !!this.activeDiscovery || this.scratch.z < -1 || this.scratch.z > 1 || x < 25 || x > innerWidth - 25 || y < 88 || y > innerHeight - 60;
+      button.hidden = this.busy || !!this.activeDiscovery || label.visible?.(engine) === false || this.scratch.z < -1 || this.scratch.z > 1 || x < 25 || x > innerWidth - 25 || y < 88 || y > innerHeight - 60;
     });
   }
   showDiscovery(id) {
@@ -102,7 +129,7 @@ export class Interface {
       ${d.activity ? `<button class="primary activity-button" data-action="activity">${icon('lab')}${d.activityTitle}</button>` : d === discoveries.earth ? '<span class="expansion">MORE ENVIRONMENTS · FUTURE EXPANSION</span>' : ''}
       <details><summary>A closer look</summary><p>${d.detail}</p></details>
       <details><summary>Science sources</summary><ul>${d.sourceIds.map(id => `<li><a href="${sources[id][1]}" target="_blank" rel="noopener noreferrer">${sources[id][0]}</a></li>`).join('')}</ul><small>Checked 27 November 2026</small></details>
-      <button class="text-button" data-action="back">${icon('back')}${this.kind === 'moon' ? 'Lunar overview' : this.kind === 'sun' ? 'Solar overview' : 'Back to space'}</button>`;
+      <button class="text-button" data-action="back">${icon('back')}${this.kind === 'moon' ? 'Lunar overview' : this.kind === 'sun' ? 'Solar overview' : this.kind === 'earth' ? 'Asia overview' : 'Back to space'}</button>`;
     this.elements.discovery.hidden = false;
     document.body.classList.add('discovering');
     this.elements.discovery.querySelector('h2').focus({ preventScroll: true });
@@ -129,7 +156,7 @@ export class Interface {
       <p>Tap a world or a glowing node to discover its name and science. Novi navigates automatically. Back returns to the overview; Home returns to space. All destinations are open from the beginning. Nothing is saved.</p>
       <h3>Art & imagery credits</h3><p>Earth: NASA Earth Observatory, Blue Marble Next Generation (July 2004), Reto Stöckli. Moon: NASA / GSFC / Arizona State University, LRO CGI Moon Kit, Ernie Wright. Novi, equipment, terrain and interface are original code-authored artwork.</p>
       <p><a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a> · <a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noopener noreferrer">Moon map credits</a></p>
-      <p class="muted">Explore the Moon and the solar observatory. Earth offers an introductory view; expanded environments are planned. Solar plasma, glare and magnetic loops are authored illustrations, not live imagery or a physical simulation. No accounts, analytics, storage, or backend services.</p>`);
+      <p class="muted">Explore the Moon and the solar observatory. Earth has a turnable globe and Asia discovery stops; walking environments and other continent destinations are planned. Solar plasma, glare and magnetic loops are authored illustrations, not live imagery or a physical simulation. No accounts, analytics, storage, or backend services.</p>`);
   }
   error(message) {
     this.setBusy(false); this.openModal(`<p class="eyebrow">A LITTLE SPACE WEATHER</p><h2 id="modal-title">We couldn’t draw this world.</h2><p>${message}</p><p>Try reloading in a browser with WebGL2 enabled. If a texture failed to load, check that the textures folder is served with the site.</p><button class="primary" onclick="location.reload()">Try again</button><p><a href="https://science.nasa.gov/moon/">Explore Moon science at NASA</a></p>`);

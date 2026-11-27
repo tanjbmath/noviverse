@@ -25,3 +25,13 @@ body[data-world=sun] .target-dot{background:#fff1d4;border-color:#6b281b;box-sha
 .solar-choices .choice:disabled{opacity:.8;cursor:default}
 .solar-choices .correct-answer{border-color:var(--mint);background:#9bf4d815;color:var(--mint)}
 @media(min-width:760px){body[data-world=sun] .sun-intro{top:110px}body[data-world=sun] .sun-intro h1{font-size:36px}body[data-world=sun] .sun-intro p:last-child{font-size:1rem}}
+
+/* Globe gestures are confined to the 3D canvas; panels retain native scrolling. */
+body[data-world=earth] #universe{touch-action:none;cursor:grab}
+body[data-world=earth] .vignette{background:linear-gradient(0deg,#06141f,transparent 18%)}
+.earth-intro p:last-child{font-size:1rem;max-width:280px}
+.earth-controls{position:fixed;z-index:5;right:28px;bottom:64px;display:flex;flex-wrap:wrap;gap:5px;padding:8px;border:1px solid var(--line);border-radius:14px;background:#0d2131e8;max-width:390px}
+.earth-controls button{min-width:44px;min-height:44px;border-radius:8px;background:#173447;color:#d8f7eb;font-size:.875rem;padding:7px 10px}
+.earth-controls button:last-child{min-width:88px}
+.discovering .earth-controls,.travelling .earth-controls{display:none}
+@media(max-width:759px){.earth-controls{left:15px;right:15px;bottom:60px;max-width:none;justify-content:center;gap:3px;padding:6px}.earth-controls button{padding:6px;flex:1}.earth-controls button:last-child{min-width:76px}.earth-intro p:last-child{font-size:.875rem}}
