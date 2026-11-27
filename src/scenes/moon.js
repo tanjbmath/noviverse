@@ -21,6 +21,13 @@ export function terrainHeight(x, z) {
   return h;
 }
 
+export function overviewPosition(width, height) {
+  const mobile = width < 760;
+  // Keep the outer discovery nodes in view when the viewport is tall and narrow.
+  const distance = mobile ? Math.max(1, 0.75 * height / width) : 1;
+  return new THREE.Vector3(mobile ? 24 : 22, mobile ? 24 : 17, mobile ? 35 : 27).multiplyScalar(distance);
+}
+
 export async function createMoon(engine) {
   const scene = new THREE.Scene(); scene.background = new THREE.Color('#080d19'); scene.fog = new THREE.FogExp2('#111726', 0.012); scene.add(starfield(800));
   const grain = makeGrain(42); grain.repeat.set(24, 24);
@@ -79,15 +86,16 @@ export async function createMoon(engine) {
       group.add(volume);
     }
     const marker = beacon(position.clone().add(new THREE.Vector3(0, id === 'tycho' ? 1.8 : 0.9, 0))); scene.add(marker); beacons.push(marker);
-    labels.push({ id, text: data.short, sub: data.icon === 'crater' ? 'Real lunar feature' : data.icon === 'rock' ? 'Representative sample' : 'Try an experiment', object: group, offset: new THREE.Vector3(0, id === 'tycho' ? 2.5 : 3, 0) });
+    labels.push({ id, text: data.short, sub: data.icon === 'crater' ? 'Real lunar feature' : data.icon === 'rock' ? 'Representative sample' : 'Try an experiment', object: group, offset: new THREE.Vector3(0, id === 'tycho' ? 2.2 : 1.3, 0) });
     targets.push(group);
   }
   const novi = createNovi(); novi.root.scale.setScalar(0.72); novi.root.position.set(0, 3, 12); scene.add(novi.root);
   const fill = new THREE.PointLight('#89f8e6', 5, 8); fill.position.set(0, 2, 1); novi.root.add(fill);
   return {
     kind: 'moon', scene, novi, labels, targets, terrainHeight,
+    overviewPosition() { return overviewPosition(innerWidth, innerHeight); },
     overview(engine) {
-      engine.camera.position.set(innerWidth < 760 ? 24 : 22, innerWidth < 760 ? 24 : 17, innerWidth < 760 ? 35 : 27);
+      engine.camera.position.copy(this.overviewPosition());
       engine.look.set(0, 0, -0.5);
     },
     resize(engine) { if (!this.visiting) this.overview(engine); },

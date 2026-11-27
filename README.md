@@ -35,7 +35,7 @@ npm run preview
 - An ideal gravity experiment with two different masses on both worlds; tap plus/minus to set 1–20 m drop height, then compare timed drops.
 - An impact-energy experiment with 5, 10, and 20 km/s choices, calculated kinetic energy, and a deliberately qualitative crater animation.
 - Earth and Sun have accessible orbital introductions. Their future surface/solar environments are explicitly labeled as future expansion.
-- Responsive 390 px phone and desktop layouts, equivalent HTML destination/POI buttons for all raycast targets, native modal focus management, accessible names, and a Reduce Motion toggle. System reduced-motion preference is respected on initial load. Keyboard activation of buttons works; there are no keyboard movement controls.
+- Responsive 390 px phone and desktop layouts, unlabeled glowing HTML nodes for all raycast targets, with 44 px touch areas, native modal focus management, accessible names, and a Reduce Motion toggle. System reduced-motion preference is respected on initial load. Keyboard activation of buttons works; there are no keyboard movement controls.
 
 ## Structure
 
@@ -64,7 +64,7 @@ scripts/verify-site.mjs      Guards against publishing the unbuilt Vite HTML ent
 
 The Moon scene is dynamically imported at destination selection; its terrain, rock textures, and meshes are constructed on demand. Experiments are imported only when opened. Earth/Moon overview maps are needed at startup to display those visible worlds. Assets are disposed when changing scenes; repeat visits reconstruct them. The single Three.js renderer is reused.
 
-To add a discovery, create a source-linked data record, add a target mesh and label in its scene, and add it to the scene's accessible dock. To add a world, give it the scene contract used by `createSpace`/`createMoon`: `scene`, `kind`, `novi`, `targets`, `labels`, `resize`, and `update`; import it on demand in navigation.
+To add a discovery, create a source-linked data record and add a target mesh and node anchor in its scene. Nodes keep accessible names for screen readers; visible names and facts appear after selection. To add a world, give it the scene contract used by `createSpace`/`createMoon`: `scene`, `kind`, `novi`, `targets`, `labels`, `resize`, and `update`; import it on demand in navigation.
 
 ## Scientific and visual boundaries
 

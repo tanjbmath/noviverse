@@ -57,3 +57,11 @@ Directly opening `index.html` is incompatible with ES modules and Vite source. B
 - `NoviVerse-source.zip`: editable source/assets/tests/docs, excluding `node_modules`, generated `dist` and Git metadata. Run `npm ci` before development.
 - `NoviVerse-static.zip`: contents of the final production `dist/`, ready for a static host. Serve over HTTP rather than opening its index file directly.
 - `noviverse-preview.jpg`: final desktop screenshot.
+
+## Unlabeled exploration nodes — 27 November 2026
+
+Replaced floating name cards with glowing nodes and removed the named destination/POI lists and Moon shortcut. Names and science remain in the discovery panels. Nodes retain accessible names, keyboard button semantics and 44 px hit areas. Lunar nodes align with the existing beacon dots. The lunar overview camera now accounts for narrow viewports so the outer rock and gravity nodes remain reachable; returning to overview uses the same camera calculation.
+
+- `npm test`: all 7 existing tests passed. Asset hashes and production root/dist checks passed.
+- Temporary Happy DOM and Three.js projection checks passed at 1280 × 720, 390 × 844 and 390 × 650: all 3 space and 5 lunar nodes are inside the visible projection bounds; buttons contain no visible text, retain accessible names and dispatch the expected click actions; travel disables/hides nodes; discovery panels reveal the selected name; closing them restores the nodes.
+- These are DOM and camera-projection checks, not rendered browser tests. Browser validation was unavailable: the local Chromium launcher lacks its binary, its official Playwright download returned HTTP 403, and the separate preview browser could not connect to the local server. Visual layering, actual touch/keyboard interaction and physical-device rendering remain unverified for this update.

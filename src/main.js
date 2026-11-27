@@ -138,7 +138,7 @@ async function back() {
   if (busy) return;
   if (world?.kind !== 'moon') { await home(); return; }
   const signal = begin('Pulling back for a little perspective…');
-  const destination = new THREE.Vector3(innerWidth < 760 ? 24 : 22, innerWidth < 760 ? 24 : 17, innerWidth < 760 ? 35 : 27);
+  const destination = world.overviewPosition();
   await engine.view(destination, new THREE.Vector3(0, 0, -0.5), duration(1.2), signal);
   if (signal.aborted) return;
   world.visiting = false; settle();

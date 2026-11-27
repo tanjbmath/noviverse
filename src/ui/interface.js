@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { icon } from './icons.js';
-import { discoveries, sources, moonPoiIds } from '../data/discoveries.js';
+import { discoveries, sources } from '../data/discoveries.js';
 
 export class Interface {
   constructor(app, actions) {
@@ -19,30 +19,18 @@ export class Interface {
       <section class="space-intro" id="space-intro">
         <p class="eyebrow"><span></span> BIG QUESTIONS. LITTLE EXPLORER.</p>
         <h1>A little curiosity.<br>A whole <em>universe.</em></h1>
-        <p class="intro-copy">Hi, I’m Novi! Pick a world.<br>I’ll take us there.</p>
-        <button class="primary" data-destination="moon">${icon('moon')} Let’s explore the Moon</button>
+        <p class="intro-copy">Hi, I’m Novi! See a glowing node?<br>Tap it and let’s find out what’s there.</p>
         <p class="micro">Just tap to travel. Wonder takes it from there.</p>
       </section>
       <section class="moon-intro" id="moon-intro" hidden>
         <button class="text-button" data-action="home">${icon('back')} Back to space</button>
         <p class="eyebrow">LUNAR FIELD TRIP</p>
         <h1>Hello, Moon.</h1>
-        <p>Tap a crater. Meet a rock.<br>Find a story billions of years in the making.</p>
+        <p>Tap a glowing node.<br>Every stop has a story to discover.</p>
       </section>
       <div id="labels" class="labels" aria-label="Objects to explore"></div>
       <aside class="novi-message" id="novi-message"><span class="mini-face" aria-hidden="true"><i></i><i></i></span><p><strong>Your co-pilot, Novi</strong><span>Small explorer. Endless questions.</span></p></aside>
       <aside id="discovery" class="discovery" aria-label="Science discovery" hidden></aside>
-      <nav id="destination-dock" class="destination-dock" aria-label="Choose a destination">
-        <div class="dock-heading"><span>WHERE SHALL WE GO?</span><span>ALL WORLDS OPEN</span></div>
-        <div class="destination-grid">
-          <button data-destination="earth" class="destination earth-card">${icon('earth')}<span><strong>Earth</strong><small>A first look</small></span><span class="tag">INTRO</span></button>
-          <button data-destination="moon" class="destination moon-card">${icon('moon')}<span><strong>The Moon</strong><small>Craters, rocks & experiments</small></span><span class="tag active-tag">EXPLORE</span></button>
-          <button data-destination="sun" class="destination sun-card">${icon('sun')}<span><strong>The Sun</strong><small>Meet our nearest star</small></span><span class="tag">INTRO</span></button>
-        </div>
-      </nav>
-      <nav id="poi-dock" class="poi-dock" aria-label="Lunar discoveries" hidden>
-        ${moonPoiIds.map(id => `<button data-poi="${id}">${icon(discoveries[id].icon)}<span>${discoveries[id].short}</span></button>`).join('')}
-      </nav>
       <footer class="field-note" id="field-note">A playful universe. Real science. <span>Sizes & distances are not to scale.</span></footer>
       <div id="travel" class="travel" hidden><div class="travel-line"></div><span class="eyebrow">NOVI IS ON THE WAY</span><p id="travel-text" role="status">Getting our spacecraft ready…</p><small>Home is always available to return to space.</small></div>
       <div id="status" class="sr-only" role="status" aria-live="polite"></div>
@@ -79,13 +67,11 @@ export class Interface {
     document.body.dataset.world = kind;
     this.elements['space-intro'].hidden = kind !== 'space';
     this.elements['moon-intro'].hidden = kind !== 'moon';
-    this.elements['destination-dock'].hidden = kind !== 'space';
-    this.elements['poi-dock'].hidden = kind !== 'moon';
     this.elements['novi-message'].hidden = kind !== 'space';
     this.elements['location-chip'].textContent = kind === 'space' ? 'SPACE EXPLORER' : 'MOON · TYCHO REGION';
     this.elements['field-note'].innerHTML = kind === 'space' ? 'A playful universe. Real science. <span>Sizes & distances are not to scale.</span>' : 'Artistic Tycho diorama · Novi’s hovercraft is fictional. <span>Geography & travel compressed. Rocks are representative.</span>';
     this.labels = labels;
-    this.elements.labels.innerHTML = labels.map(label => `<button class="object-label" data-${kind === 'space' ? 'destination' : 'poi'}="${label.id}"><span class="target-dot"></span><strong>${label.text}</strong><small>${label.sub}</small></button>`).join('');
+    this.elements.labels.innerHTML = labels.map(label => `<button class="explore-node" aria-label="Explore ${label.text}" data-${kind === 'space' ? 'destination' : 'poi'}="${label.id}"><span class="target-dot" aria-hidden="true"></span></button>`).join('');
     this.labelButtons = [...this.elements.labels.children];
     this.hideDiscovery();
   }
@@ -95,8 +81,8 @@ export class Interface {
       label.object.getWorldPosition(this.scratch); this.scratch.add(label.offset).project(engine.camera);
       const x = (this.scratch.x + 1) / 2 * innerWidth, y = (-this.scratch.y + 1) / 2 * innerHeight;
       const button = this.labelButtons[i];
-      button.style.transform = `translate(${x}px,${y}px) translate(-50%,0)`;
-      button.hidden = this.busy || !!this.activeDiscovery || this.scratch.z < -1 || this.scratch.z > 1 || x < 25 || x > innerWidth - 25 || y < 88 || y > innerHeight - (this.kind === 'moon' ? 130 : 185);
+      button.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%)`;
+      button.hidden = this.busy || !!this.activeDiscovery || this.scratch.z < -1 || this.scratch.z > 1 || x < 25 || x > innerWidth - 25 || y < 88 || y > innerHeight - 60;
     });
   }
   showDiscovery(id) {
@@ -133,7 +119,7 @@ export class Interface {
       <p>Novi is an original fictional explorer. The transforming spacecraft, scanner, short journeys, and gravity lab equipment are imagined. A real lunar hover vehicle would need thrust: there is almost no air for wings or fans to push against.</p>
       <p>Our crater names and catalog measurements come from the USGS / IAU Gazetteer. The local terrain is an artistic diorama, not surveyed topography. Craters are compressed in scale and spacing, and rock models represent real rock types rather than known specimens at these positions.</p>
       <p>The Earth and Moon use credited NASA maps. Lighting, speeds, sizes, and distances are arranged for exploration. The Sun is a stylized illustration. No NASA endorsement is implied.</p>
-      <p>Tap a world or a labeled object. Novi navigates automatically. Back returns to the overview; Home returns to space. All destinations are open from the beginning. Nothing is saved.</p>
+      <p>Tap a world or a glowing node to discover its name and science. Novi navigates automatically. Back returns to the overview; Home returns to space. All destinations are open from the beginning. Nothing is saved.</p>
       <h3>Art & imagery credits</h3><p>Earth: NASA Earth Observatory, Blue Marble Next Generation (July 2004), Reto Stöckli. Moon: NASA / GSFC / Arizona State University, LRO CGI Moon Kit, Ernie Wright. Novi, equipment, terrain and interface are original code-authored artwork.</p>
       <p><a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a> · <a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noopener noreferrer">Moon map credits</a></p>
       <p class="muted">First playable edition · Moon loop complete. Earth and Sun offer introductory views; expanded worlds are planned. No accounts, analytics, storage, or backend services.</p>`);
