@@ -1,0 +1,96 @@
+# NoviVerse
+
+An initial playable, static Three.js science adventure. Every visit starts in space. Tap a world or point of interest; Novi navigates automatically. Novi navigates automatically; the Earth globe has direct camera controls. No accounts, saving, database, Firebase, analytics, or external runtime API.
+
+## Run locally
+
+Requires Node.js 22.12+ (verified here on 24.22.1).
+
+**Windows: double-click `Start-NoviVerse.cmd`.** It opens the game at a local web address. Keep its window open while playing. In the source package, the first launch installs dependencies and builds the game if `dist/` is missing. In the static package, it serves the included game directly without installing project dependencies. Opening `index.html` directly now shows these instructions instead of an empty screen.
+
+For development, you can also use:
+
+```sh
+npm ci
+npm run dev
+```
+
+Open the local address printed by Vite. Use a web server; opening `index.html` directly as a file will not run ES modules correctly.
+
+```sh
+npm test
+npm run assets:verify
+npm run build
+npm run preview
+```
+
+`dist/` is the complete static site. `npm run build` also refreshes the tracked static copy at the repository root, so GitHub Pages can publish **main / (root)** directly. Relative asset paths support the `/noviverse/` repository subpath. Editable HTML is in `src/index.html`; the root `index.html` is generated. See [DEPLOYMENT.md](DEPLOYMENT.md) for branch-based Pages, the optional manual Actions workflow, and other static hosts. Updating the root copy can trigger an existing branch-based Pages deployment.
+
+## Playable scope
+
+- Rotating NASA-textured Earth, a textured Moon slowly orbiting Earth, a plasma-textured Sun with soft additive glare and rays, starfield, atmospheric rim lighting, and an original articulated 3D Novi spacecraft with a visible idle hover and gentle sway. The Moon completes an artistic orbit in 150 seconds; its position locks during navigation. Reduce Motion freezes ambient movement, including solar plasma and corona animation.
+- Click/tap destinations, cinematic automatic flight, descent, continuous engine-pod and wing transformation into lunar hover mode, automatic approaches and scanning, Back and Home.
+- A localized artistic Tycho-region diorama with selectable **Tycho** and **Tycho A**, terraced crater terrain, central peak, scattered instanced debris, representative breccia and anorthosite boulders, and a fictional gravity-lab instrument.
+- Each discovery has an explanation, fact, optional deeper text, and primary-source links. No progression gates or collection requirements.
+- An ideal gravity experiment with two different masses on both worlds; tap plus/minus to set 1–20 m drop height, then compare timed drops.
+- An impact-energy experiment with 5, 10, and 20 km/s choices, calculated kinetic energy, and a deliberately qualitative crater animation.
+- A solar observatory reached by tapping the Sun: animated granular plasma, dark sunspot groups, luminous prominence strands, and a streaming corona. Four unlabeled nodes reveal NASA-linked science about the photosphere, sunspots, prominences and corona, with a replayable three-question Sun detective activity. Novi remains a spacecraft; there is no solar landing.
+- Tapping Earth opens a turnable NASA-textured globe with all seven continents visible. Drag/swipe or scroll to turn; pinch or Shift/Ctrl-scroll to zoom. Accessible turn/zoom/reset buttons provide a pointer-independent alternative. The first available continent is Asia, with geographically anchored Merapi, Himalayas and Borneo science stops. Back returns from a stop to Asia, then to the globe; Home returns to space. Tapping a location zooms into an illustrated scenic close-up. Novi folds the spacecraft and deploys a walking field-explorer form; three feature nodes per location open closer views and source-linked details. Each location has a three-clue picture challenge. Underground exploration remains future work.
+- Responsive 390 px phone and desktop layouts, unlabeled glowing HTML nodes for all raycast targets, with 44 px touch areas, native modal focus management, accessible names, and a Reduce Motion toggle. System reduced-motion preference is respected on initial load. Keyboard activation of buttons works; there are no keyboard movement controls.
+
+## Structure
+
+```text
+src/main.js                 Navigation and interruptible journey orchestration
+src/index.html              Editable Vite HTML entry and startup recovery message
+src/core/engine.js          Renderer, frame loop, raycasting, camera tweening
+src/core/assets.js          Local texture loader and procedural microtexture
+src/core/dispose.js         Deduplicated GPU-resource disposal
+src/core/math.js            Deterministic art helpers and experiment physics
+src/core/globe-controls.js  Pointer, wheel and pinch camera controls with tap/drag separation
+src/models/novi.js          Original multi-part character/craft rig and animation
+src/models/sun.js           Shared plasma, sunspot, prominence and additive glare shaders/meshes
+src/scenes/space.js         Space scene and responsive planet composition
+src/scenes/moon.js          On-demand lunar diorama and POIs
+src/scenes/sun.js           On-demand solar observatory and responsive discovery views
+src/scenes/earth.js         On-demand globe, geographic nodes and continent/site views
+src/scenes/wonder.js        Illustrated close-ups with 3D Novi and feature camera views
+src/data/wonders.js         Art anchors, feature science and location challenge clues
+src/ui/wonder-activity.js   Picture-based discovery challenges
+src/data/earth.js           Expandable continent and location registry
+src/scenes/shared.js        Starfield, atmosphere and beacons
+src/data/discoveries.js     Source-linked science records and POI definitions
+src/ui/interface.js         Accessible HUD, panels and dialogs
+src/ui/activities.js        On-demand experiment module
+public/textures/            Bundled NASA maps (no runtime hotlink dependency)
+public/asset-manifest.json  Origin, usage terms, credits, hashes and sizes
+tests/                     Physics, content, terrain, transform and disposal checks
+index.html, assets/          Generated static entry and bundles for branch-based Pages
+textures/                   Generated copies of the credited public textures
+scripts/publish-root.mjs     Refreshes the built root copy without deleting source
+scripts/verify-site.mjs      Guards against publishing the unbuilt Vite HTML entry
+```
+
+The Moon scene is dynamically imported at destination selection; its terrain, rock textures, and meshes are constructed on demand. Experiments are imported only when opened. Earth/Moon overview maps are needed at startup to display those visible worlds. Assets are disposed when changing scenes; repeat visits reconstruct them. The single Three.js renderer is reused.
+
+Earth expansion: enable a continent in `src/data/earth.js`, add its region and location records, then add the matching source-linked discoveries in `src/data/discoveries.js`. Names are revealed after selection; rear-side nodes are hidden and blocked by the globe. Broad-region anchors are representative; Merapi uses Smithsonian coordinates. Geography is aligned to the existing equirectangular map, with no political boundary layer or live land-cover claim.
+
+Earth close-ups use separately generated scenic illustrations with a volumetric animated Novi character (2.5D), not surveyed or fully modeled terrain. Art anchors identify depicted features; there is no collision or free-roaming simulation. Return from a detail to the lookout, then to the continent; Home always returns to space. The three scenic images and their original prompts are recorded in `docs/wonder-art-prompts.md`.
+
+To add a discovery, create a source-linked data record and add a target mesh and node anchor in its scene. Nodes keep accessible names for screen readers; visible names and facts appear after selection. To add a world, give it the scene contract used by `createSpace`/`createMoon`: `scene`, `kind`, `novi`, `targets`, `labels`, `resize`, and `update`; import it on demand in navigation.
+
+## Scientific and visual boundaries
+
+This is an authored diorama, **not** a geographic simulator or photogrammetry. Catalog coordinates and diameters are real; crater positions, separations, shapes, vertical relief and journey times are compressed/exaggerated for play. The rock models are representative artwork, not identified specimens at real Tycho locations. No exact historical spacecraft or landing site is implied. Novi and the transforming equipment are original fiction. The fictional hovercraft depicts downward thrust, not aerodynamic lift in a lunar atmosphere.
+
+The gravity experiment uses constant surface gravity and no air resistance on **both** worlds: `t = sqrt(2h/g)`, with Earth 9.81 m/s² and Moon 1.62 m/s². The impact activity calculates `E = ½mv²` in SI units. It does not calculate crater diameters, reproduce Tycho's impact, or solve impact hydrodynamics.
+
+The Sun uses authored shaders for granular plasma, illustrative sunspots, prominence strands and a corona-like halo. Glare/rays illustrate optical scattering; the halo is not a solid solar layer. Colors, feature placement, dimensions and animation speeds are artistic, not live solar data or a fluid/magnetic simulation. Novi’s viewing position is fictional. Lighting and planet arrangement are artistic, not a physical ephemeris. Earth's rotating texture is a historical July 2004 composite, not live weather. No orbital-accuracy or accurate-scale mode is implemented.
+
+See [SCIENCE.md](SCIENCE.md) and [ASSET_LICENSES.md](ASSET_LICENSES.md) for reviewed sources and rights provenance; [VERIFICATION.md](VERIFICATION.md) for actual checks and remaining limits.
+
+## Performance limits
+
+WebGL2 is required. Pixel ratio is capped at 1.75; debris is instanced; no physics engine, postprocessing stack, web fonts, audio downloads, or backend is needed. Base Earth/Moon imagery totals about 1.76 MB. Wonder artwork is loaded only when its location is selected (about 0.49–0.59 MB per location; about 1.66 MB across all three). Three.js is a separate ~541 KB minified / ~141 KB gzip chunk, which triggers Vite's default 500 KB advisory. Scene and experiment code are split independently. Further model batching, compressed texture formats, lower GPU tiers, and physical-device profiling would be worthwhile before a broad mobile release.
+
+Errors loading scenes and WebGL context loss show a reload/recovery dialog. Full offline use after an ordinary browser reload is not guaranteed: there is no service worker or installed PWA. A static host or local server is needed. No state persists between visits.
