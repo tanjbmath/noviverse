@@ -33,7 +33,8 @@ export function anchorVisible(point, cameraPosition) {
 
 export async function createEarth(engine, options = {}) {
   const map = options.map || await loadTexture('earth.jpg', engine.renderer);
-  const scene = new THREE.Scene(); scene.background = new THREE.Color('#06141f'); scene.add(starfield(700));
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#06141f');
+  const stars = starfield(700); scene.add(stars);
   const globe = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS, 96, 64), new THREE.MeshStandardMaterial({ map, roughness: .88 }));
   scene.add(globe);
   const air = atmosphere(EARTH_RADIUS + .10, '#60c8ff', .6); scene.add(air);
@@ -94,7 +95,7 @@ export async function createEarth(engine, options = {}) {
       else if (action === 'in' || action === 'out') controls.zoom(action === 'in' ? .88 : 1.12);
       else controls.rotate(dx, dy);
     },
-    update(dt, time, e) { novi.update(time, e.paused, dt); },
+    update(dt, time, e) { novi.update(time, e.paused, dt); stars.update(time, e.paused, dt); },
   };
   controls.setPose(globePose); world.setLevel(null);
   return world;

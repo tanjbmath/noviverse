@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { createSpaceMotion, SOLAR_PLANETS, SolarControls } from '../src/scenes/space.js';
+import { starfield } from '../src/scenes/shared.js';
 import { createNovi } from '../src/models/novi.js';
 import { disposeScene } from '../src/core/dispose.js';
 
@@ -154,3 +155,59 @@ test('Novi banks inward toward orbited planet and responds with inertial spring 
   assert.ok(Math.abs(hull.rotation.z) > 0.04, 'Hull banks smoothly during turning flight');
   disposeScene(scene);
 });
+
+test('Novi enters planet orbit along its incoming flight direction without reversing', () => {
+  const { novi, planets, motion, engine } = setupSolarSystem(1280, 720);
+  const shipFrom = new THREE.Vector3(-12.5, -2.5, 19.5);
+  for (const id of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+    const focus = motion.planetFocusView(id, 1280, shipFrom);
+    motion.setVisitOrbit(focus.orbitAngle, focus.orbitDir);
+    motion.visitingPlanet = id;
+    const incoming = planets[id].mesh.position.clone().sub(shipFrom);
+    incoming.y = 0;
+    incoming.normalize();
+    const orbitTan = focus.noviTangent.clone();
+    orbitTan.y = 0;
+    orbitTan.normalize();
+    assert.ok(incoming.dot(orbitTan) > 0.75, `${id} entry tangent aligns forward with incoming flight (${incoming.dot(orbitTan).toFixed(2)})`);
+    const p0 = focus.noviPos.clone();
+    motion.update(0.25, 0.25, engine);
+    const step = novi.root.position.clone().sub(p0).normalize();
+    assert.ok(step.dot(focus.noviTangent) > 0.85, `${id} continues forward along entry tangent`);
+  }
+});
+
+test('dynamic starfield creates layered GPU particles, animates when unpaused, ignores raycasts, and disposes cleanly', () => {
+  const scene = new THREE.Scene();
+  const stars = starfield(1200);
+  scene.add(stars);
+
+  const layers = stars.children.filter(c => c.isPoints);
+  assert.equal(layers.length, 3);
+  const totalParticles = layers.reduce((sum, l) => sum + l.geometry.getAttribute('position').count, 0);
+  assert.equal(totalParticles, 1200);
+
+  for (const layer of layers) {
+    assert.equal(layer.material.isShaderMaterial, true);
+    assert.equal(layer.material.uniforms.uTime.value, 0);
+  }
+
+  const raycaster = new THREE.Raycaster();
+  raycaster.set(new THREE.Vector3(0, 0, 100), new THREE.Vector3(0, 0, -1));
+  assert.equal(raycaster.intersectObject(stars, true).length, 0);
+
+  stars.update(1.5, false, 0.04);
+  for (const layer of layers) {
+    assert.equal(layer.material.uniforms.uTime.value, 1.5);
+  }
+  assert.ok(layers[0].rotation.y > 0);
+  assert.ok(layers[2].rotation.y < 0);
+
+  const frozenRotY = layers[2].rotation.y;
+  stars.update(4.0, true, 0.05);
+  assert.equal(layers[2].material.uniforms.uTime.value, 1.5);
+  assert.equal(layers[2].rotation.y, frozenRotY);
+
+  disposeScene(scene);
+});
+

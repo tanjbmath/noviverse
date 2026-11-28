@@ -115,7 +115,8 @@ function makeOrbitRing(radius, color = '#587b9e', opacity = 0.22) {
 export async function createSpace(engine) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#070d1c');
-  scene.add(starfield(1500));
+  const stars = starfield(1500);
+  scene.add(stars);
 
   const [earthMap, moonMap] = await Promise.all([
     loadTexture('earth.jpg', engine.renderer),
@@ -211,7 +212,7 @@ export async function createSpace(engine) {
     if (activeEngine && !motion.visitingPlanet) motion.applyCamera(activeEngine);
   });
 
-  const motion = createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, planets, belt, controls, shipLight });
+  const motion = createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, planets, belt, controls, shipLight, stars });
 
   return {
     kind: 'space',
@@ -240,9 +241,10 @@ function orbitOffset(phase) {
   return new THREE.Vector3(Math.cos(phase), Math.sin(phase) * Math.cos(0.45), -Math.sin(phase) * Math.sin(0.45));
 }
 
-export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, planets, belt, controls, shipLight }) {
+export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, planets, belt, controls, shipLight, stars }) {
   let moonPhase = 0.65;
   let visitOrbitAngle = 0.9;
+  let visitOrbitDir = -1;
   let idle = true;
   let moonRadius = 5.05;
   let orbitScale = 1;
@@ -275,35 +277,32 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
     orbit.position.copy(earth.position);
   };
 
-  const sampleOrbitPoint = (center, baseR, angle, out) => {
-    const orbitR = baseR * (1 - 0.065 * Math.cos(angle - 0.4));
-    return out.set(
-      center.x + Math.cos(angle) * orbitR,
-      center.y + Math.sin(angle + 0.35) * (orbitR * 0.24),
-      center.z + Math.sin(angle) * orbitR,
-    );
-  };
+  const sampleOrbitPoint = (center, orbitR, angle, out) => out.set(
+    center.x + Math.cos(angle) * orbitR,
+    center.y + Math.sin(angle + 0.35) * (orbitR * 0.22),
+    center.z + Math.sin(angle) * orbitR,
+  );
 
-  const planetOrbitPose = (id, angle) => {
+  const planetOrbitPose = (id, angle, dir = visitOrbitDir) => {
     const p = planets?.[id];
     if (!p) return null;
     const r = p.radius * planetScale;
-    const baseR = id === 'saturn' ? r * 2.62 : Math.max(r * 1.9, r + 0.58);
+    const orbitR = id === 'saturn' ? r * 2.62 : Math.max(r * 1.9, r + 0.58);
     const center = p.mesh.position;
-    const position = sampleOrbitPoint(center, baseR, angle, new THREE.Vector3());
-    const eps = 0.01;
-    sampleOrbitPoint(center, baseR, angle - eps, _posA);
-    sampleOrbitPoint(center, baseR, angle + eps, _posB);
+    const position = sampleOrbitPoint(center, orbitR, angle, new THREE.Vector3());
+    const eps = 0.01 * (dir < 0 ? -1 : 1);
+    sampleOrbitPoint(center, orbitR, angle - eps, _posA);
+    sampleOrbitPoint(center, orbitR, angle + eps, _posB);
     const tangent = _posB.clone().sub(_posA).normalize();
     _inward.copy(center).sub(position).normalize();
-    _up.copy(_worldUp).addScaledVector(_inward, 0.42).normalize();
+    _up.copy(_worldUp).addScaledVector(_inward, 0.36).normalize();
     _ahead.copy(position).add(tangent);
     const quaternion = new THREE.Quaternion().setFromRotationMatrix(_lookMat.lookAt(_ahead, position, _up));
-    return { position, tangent, quaternion, orbitR: baseR, r, center };
+    return { position, tangent, quaternion, orbitR, r, center };
   };
 
   const placeNoviOnPlanetOrbit = id => {
-    const pose = planetOrbitPose(id, visitOrbitAngle);
+    const pose = planetOrbitPose(id, visitOrbitAngle, visitOrbitDir);
     if (!pose) return;
     novi.root.position.copy(pose.position);
     novi.root.quaternion.copy(pose.quaternion);
@@ -361,7 +360,11 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
   const motion = {
     visitingPlanet: null,
     setIdle(value) { idle = value; },
-    resetVisitOrbit() { visitOrbitAngle = 0.9; },
+    resetVisitOrbit() { visitOrbitAngle = 0.9; visitOrbitDir = -1; },
+    setVisitOrbit(angle, dir = -1) {
+      visitOrbitAngle = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      visitOrbitDir = dir < 0 ? -1 : 1;
+    },
     applyCamera(engine) {
       const view = computeOverview(lastWidth, lastHeight);
       engine.camera.position.copy(view.position);
@@ -372,13 +375,39 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
       const noviPose = noviOverviewPose(width);
       return { ...view, noviPose };
     },
-    planetFocusView(id, width = lastWidth) {
-      const entry = planetOrbitPose(id, 0.9);
-      if (!entry) return null;
+    planetFocusView(id, width = lastWidth, fromPos = null) {
+      const p = planets?.[id];
+      if (!p) return null;
       const mobile = width < 760;
-      const { r, center } = entry;
-      const dist = Math.max(4.4, r * (id === 'saturn' ? 7.2 : 5.8)) * (mobile ? 1.18 : 1);
+      const center = p.mesh.position;
       const camDir = new THREE.Vector3(0.36, 0.34, 0.87).normalize();
+      let orbitAngle = 0.9;
+      let orbitDir = -1;
+      if (fromPos) {
+        const dx = center.x - fromPos.x;
+        const dz = center.z - fromPos.z;
+        const len = Math.hypot(dx, dz);
+        const ix = len > 1e-3 ? dx / len : 1;
+        const iz = len > 1e-3 ? dz / len : 0;
+        const camLen = Math.hypot(camDir.x, camDir.z);
+        const cx = camDir.x / camLen;
+        const cz = camDir.z / camLen;
+        // Pick CCW (-1) vs CW (+1) tangential capture point with best front-side sweep visibility.
+        const aCcw = Math.atan2(ix, -iz) + 0.32;
+        const aCw = Math.atan2(-ix, iz) - 0.32;
+        const vis = (a, dir) => (Math.cos(a) * cx + Math.sin(a) * cz)
+          + 0.55 * (Math.cos(a + dir * 0.55) * cx + Math.sin(a + dir * 0.55) * cz);
+        if (vis(aCw, 1) > vis(aCcw, -1)) {
+          orbitAngle = aCw;
+          orbitDir = 1;
+        } else {
+          orbitAngle = aCcw;
+          orbitDir = -1;
+        }
+      }
+      const entry = planetOrbitPose(id, orbitAngle, orbitDir);
+      const { r } = entry;
+      const dist = Math.max(4.4, r * (id === 'saturn' ? 7.2 : 5.8)) * (mobile ? 1.18 : 1);
       const position = center.clone().addScaledVector(camDir, dist);
       // Frame planet and Novi's orbit clearly alongside the discovery panel
       const look = center.clone().add(mobile ? new THREE.Vector3(0, -r * 1.25, 0) : new THREE.Vector3(r * 1.45, 0.08, 0));
@@ -387,10 +416,10 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
       const noviQuaternion = entry.quaternion.clone();
       const noviTangent = entry.tangent.clone();
       const noviScale = clamp(r * 0.16, 0.11, 0.25);
-      return { position, look, noviPos, noviLookAt, noviQuaternion, noviTangent, noviScale, target: center.clone() };
+      return { position, look, noviPos, noviLookAt, noviQuaternion, noviTangent, noviScale, orbitAngle, orbitDir, target: center.clone() };
     },
     currentVisitPose() {
-      return this.visitingPlanet ? planetOrbitPose(this.visitingPlanet, visitOrbitAngle) : null;
+      return this.visitingPlanet ? planetOrbitPose(this.visitingPlanet, visitOrbitAngle, visitOrbitDir) : null;
     },
     resize(engine, width = innerWidth, height = innerHeight) {
       lastWidth = width;
@@ -484,8 +513,7 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
           placeMoon();
         }
         if (this.visitingPlanet && planets) {
-          const speedBoost = 1 + 0.13 * Math.cos(visitOrbitAngle - 0.4);
-          visitOrbitAngle = (visitOrbitAngle + dt * 0.85 * speedBoost) % (Math.PI * 2);
+          visitOrbitAngle = (visitOrbitAngle + visitOrbitDir * dt * 0.85 + Math.PI * 2) % (Math.PI * 2);
           placeNoviOnPlanetOrbit(this.visitingPlanet);
         } else if (shipLight) {
           shipLight.position.copy(novi.root.position).add(_ahead.set(0.4, 2.2, 2.4));
@@ -493,6 +521,7 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
       }
       novi.update(time, engine.paused, dt);
       solar?.update(time, engine.camera);
+      stars?.update(time, engine.paused, dt);
     },
   };
 

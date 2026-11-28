@@ -380,8 +380,8 @@ export function createNovi() {
             lastSpeed += (speed - lastSpeed) * (1 - Math.exp(-10 * safeDt));
             const turnLat = curRight.dot(dForward.copy(curForward).sub(prevForward)) / safeDt;
             const climbRatio = dist > 1e-4 ? deltaPos.y / dist : 0;
-            targetBank = Math.max(-0.26, Math.min(0.26, -turnLat * 0.095));
-            targetPitch = Math.max(-0.18, Math.min(0.18, -accel * 0.008 - climbRatio * 0.04));
+            targetBank = Math.max(-0.16, Math.min(0.16, -turnLat * 0.055));
+            targetPitch = Math.max(-0.16, Math.min(0.16, -accel * 0.008 - climbRatio * 0.04));
           } else {
             lastSpeed = 0;
           }

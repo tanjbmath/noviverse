@@ -28,7 +28,8 @@ export function solarView(width, height, discovery = false) {
 }
 
 export function createSolarScene() {
-  const scene = new THREE.Scene(); scene.background = new THREE.Color('#100b13'); scene.add(starfield(600));
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#100b13');
+  const stars = starfield(600); scene.add(stars);
   const solar = createSun(); scene.add(solar.root);
   solar.surface.userData.poi = 'photosphere';
   const novi = createNovi(); novi.root.position.set(-5, -3.7, 5); novi.root.rotation.set(.04, .35, -.08); novi.root.scale.setScalar(.65); scene.add(novi.root);
@@ -54,6 +55,6 @@ export function createSolarScene() {
       engine.camera.position.copy(view.position); engine.look.copy(view.look);
       novi.root.scale.setScalar(width < 760 ? .48 : .65);
     },
-    update(dt, time, engine) { solar.update(time, engine.camera); novi.update(time, engine.paused, dt); },
+    update(dt, time, engine) { solar.update(time, engine.camera); novi.update(time, engine.paused, dt); stars.update(time, engine.paused, dt); },
   };
 }

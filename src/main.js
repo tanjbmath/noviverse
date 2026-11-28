@@ -68,16 +68,19 @@ const _worldUp = new THREE.Vector3(0, 1, 0);
 
 function makeFlightCurve(from, to, startDir, endDir, lift = 0) {
   const dist = Math.max(1, from.distanceTo(to));
-  const p1 = from.clone().addScaledVector(startDir, dist * 0.34);
-  const p2 = to.clone().addScaledVector(endDir, -dist * 0.34);
-  if (lift) {
-    p1.y += dist * lift;
-    p2.y += dist * lift * 0.65;
-  }
+  const p1 = from.clone().addScaledVector(startDir, dist * 0.32);
+  const p2 = to.clone().addScaledVector(endDir, -dist * 0.32);
+  if (lift) p1.y += dist * lift;
   return new THREE.CubicBezierCurve3(from.clone(), p1, p2, to.clone());
 }
 
-function applyFlightPose(novi, curve, { fromQuat, toQuat, scaleFrom, scaleTo, endBlendStart = 0.72, bankGain = 3.2 }, t) {
+// Smooth takeoff from rest (s'(0)=0) easing into steady forward momentum at arrival (s'(1)=endSlope).
+function cruiseProgress(rawT, endSlope = 0.32) {
+  const u = Math.max(0, Math.min(1, rawT));
+  return u * u * ((3 - endSlope) + (endSlope - 2) * u);
+}
+
+function applyFlightPose(novi, curve, { fromQuat, toQuat, scaleFrom, scaleTo, endBlendStart = 0.65, bankGain = 2.4 }, t) {
   const pos = curve.getPoint(t);
   novi.root.position.copy(pos);
   if (scaleFrom !== undefined && scaleTo !== undefined) {
@@ -98,7 +101,7 @@ function applyFlightPose(novi, curve, { fromQuat, toQuat, scaleFrom, scaleTo, en
   _flightAhead.copy(pos).add(_flightTan);
   _flightQuat.setFromRotationMatrix(_flightMat.lookAt(_flightAhead, pos, _flightUp));
 
-  const startBlend = THREE.MathUtils.smoothstep(t, 0, 0.24);
+  const startBlend = THREE.MathUtils.smoothstep(t, 0, 0.28);
   novi.root.quaternion.copy(fromQuat).slerp(_flightQuat, startBlend);
   if (toQuat) {
     const endBlend = THREE.MathUtils.smoothstep(t, endBlendStart, 1);
@@ -159,21 +162,28 @@ async function destination(id) {
     world.novi.setMoving(true);
     if (SOLAR_PLANET_IDS.has(id)) {
       world.resetVisitOrbit?.();
-      const focus = world.planetFocusView(id);
       const shipFrom = world.novi.root.position.clone();
+      const focus = world.planetFocusView(id, innerWidth, shipFrom);
+      world.setVisitOrbit?.(focus.orbitAngle, focus.orbitDir);
       const qFrom = world.novi.root.quaternion.clone();
       const scaleFrom = world.novi.root.scale.x;
-      const startDir = new THREE.Vector3(0, 0, 1).applyQuaternion(qFrom).normalize();
-      const curve = makeFlightCurve(shipFrom, focus.noviPos, startDir, focus.noviTangent, 0.08);
-      const flight = engine.animate(duration(1.75), t => {
+      const toTarget = focus.noviPos.clone().sub(shipFrom).normalize();
+      const noseDir = new THREE.Vector3(0, 0, 1).applyQuaternion(qFrom).normalize();
+      // Only follow current nose when already aimed forward; otherwise sweep directly toward destination.
+      const startDir = noseDir.dot(toTarget) > 0.2
+        ? noseDir
+        : toTarget.clone().lerp(focus.noviTangent, 0.2).normalize();
+      const curve = makeFlightCurve(shipFrom, focus.noviPos, startDir, focus.noviTangent, 0.06);
+      const flight = engine.animate(duration(1.75), (t, rawT) => {
+        const u = cruiseProgress(rawT ?? t, 0.3);
         applyFlightPose(world.novi, curve, {
           fromQuat: qFrom,
           toQuat: focus.noviQuaternion,
           scaleFrom,
           scaleTo: focus.noviScale,
-          endBlendStart: 0.78,
-          bankGain: 3.6,
-        }, t);
+          endBlendStart: 0.65,
+          bankGain: 2.2,
+        }, u);
       }, signal);
       await engine.view(focus.position, focus.look, duration(1.75), signal);
       await flight;

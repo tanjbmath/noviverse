@@ -29,7 +29,8 @@ export function overviewPosition(width, height) {
 }
 
 export async function createMoon(engine) {
-  const scene = new THREE.Scene(); scene.background = new THREE.Color('#080d19'); scene.fog = new THREE.FogExp2('#111726', 0.012); scene.add(starfield(800));
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#080d19'); scene.fog = new THREE.FogExp2('#111726', 0.012);
+  const stars = starfield(800); scene.add(stars);
   const grain = makeGrain(42); grain.repeat.set(24, 24);
   const terrain = new THREE.PlaneGeometry(95, 95, 190, 190); terrain.rotateX(-Math.PI / 2);
   const positions = terrain.attributes.position, colors = [];
@@ -101,6 +102,7 @@ export async function createMoon(engine) {
     resize(engine) { if (!this.visiting) this.overview(engine); },
     update(dt, time, engine) {
       novi.update(time, engine.paused, dt);
+      stars.update(time, engine.paused, dt);
       beacons.forEach((b, i) => { b.children[0].scale.setScalar(1 + (engine.paused ? 0 : Math.sin(time * 2 + i) * 0.13)); });
     },
   };
