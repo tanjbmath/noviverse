@@ -36,3 +36,24 @@ The three location scenes use artistic scenic illustrations with normalized feat
 - Merapi: summit/dome, loose volcanic deposits and rock cooling. Sources: Smithsonian GVP above, [USGS eruption processes](https://www.usgs.gov/faqs/how-do-volcanoes-erupt), [USGS lahars](https://www.usgs.gov/programs/VHP/lahars-move-rapidly-down-valleys-rivers-concrete), and [USGS igneous rocks](https://www.usgs.gov/faqs/what-are-igneous-rocks). The depicted lookout is imagined; no live activity, hazard-zone or specimen-identification claim is made.
 - Himalayas: plate compression and folding use the USGS Himalaya source above. Glacier accumulation and flow use [USGS glacier education](https://www.usgs.gov/water-science-school/science/glaciers-things-know). No named peak, measured glacier or deformation rate is claimed.
 - Borneo: habitat connectivity uses UNESCO Kinabatangan above; general forest layers and buttress support use [NParks forest ecosystems](https://www.nparks.gov.sg/nature/ecosystems/terrestrial-freshwater). These general plant structures are illustrated without identifying tree species or mapping an exact river reach.
+
+## Current astronomy entry · checked 28 November 2026
+
+`src/data/astronomy.js` supplies ten destination records, three science notes and one misconception question each. Rounded equatorial diameters and mean AU distances are educational values. The pages below are primary-source NASA references, also linked in each in-app panel. No changeable moon counts or live positions are claimed.
+
+| Destination | Source |
+| --- | --- |
+| Mercury | https://science.nasa.gov/mercury/facts/ |
+| Venus | https://science.nasa.gov/venus/venus-facts/ |
+| Earth | https://science.nasa.gov/earth/facts/ |
+| Mars | https://science.nasa.gov/mars/facts/ |
+| Jupiter | https://science.nasa.gov/jupiter/jupiter-facts/ |
+| Saturn | https://science.nasa.gov/saturn/facts/ |
+| Uranus | https://science.nasa.gov/uranus/facts/ |
+| Neptune | https://science.nasa.gov/neptune/neptune-facts/ |
+| Sun | https://science.nasa.gov/sun/facts/ |
+| Moon | https://science.nasa.gov/moon/facts/ |
+
+Size/order reference: https://science.nasa.gov/solar-system/planet-sizes-and-locations-in-our-solar-system/
+
+The circular display orbits, phases, speeds, distances, ambient fill light and rocket journeys are artistic. Tilt is shown without full astronomical pole alignment. Saturn’s ring pattern is representative, not measured particle positions. Planet discovery nodes indicate general observations rather than fixed surveyed coordinates. Neptune’s blue texture is enhanced. The Earth map is historical July 2004 imagery. The scene is a solar-system exploration, not a whole-universe or live-sky simulation.
