@@ -1,3 +1,24 @@
+# Astronomy revamp verification · 28 November 2026
+
+The remote repository was inspected before implementation. No astronomy-only revamp branch, commit or PR existed; `main` was at `088742777a995c58eae2602ddae6487e5785130f` (Earth wonder close-ups). This change supplies the missing approved astronomy direction.
+
+## Verified
+
+- 26 Node tests pass, including the original 20 regression tests. New checks cover the ten-body catalog and 30 discoveries, circular orbit radii, scene construction without camera mutation, orbit locking during focus/travel, rotation, texture disposal, rocket transforms and reduced motion, pointer tap/drag/multi-touch/cancellation separation, and aborting a camera trip before Home navigation.
+- Projection checks cover 1280 × 800, 1920 × 1080, 390 × 844, 360 × 640, 760 × 844 and 844 × 390. Focused discovery nodes fit the viewport, clear the information panel, and retain at least 44 px separation at the starting view. This is geometry validation, not rendered screenshot validation.
+- All bundled texture/artwork hashes and byte sizes match the asset manifest. New images are valid JPEGs. The production build and repository-root/dist/subpath entry checks pass; the published manifest matches the source manifest.
+- In the managed browser, all ten destination panels, each first discovery, source link, motion-toggle state and Overview navigation were exercised. Saturn’s quick question was exercised through wrong answer, retry, correct feedback and disabled completed answers. These browser checks ran in the app’s reading/question fallback.
+
+## Limits
+
+The managed browser reports `GL_VENDOR = Disabled` and cannot create a WebGL context. Therefore actual 3D rendering, shader appearance, rocket visual quality, GPU performance, real touch/pinch behavior and device-rotation layouts remain unverified. Scene/model tests run Three.js geometry without a GPU; they do not replace a rendered browser test. The original Three.js >500 KB bundle advisory remains. No physical phone was available.
+
+The current experience covers the Sun, eight planets and Earth’s Moon. Other stars, galaxies, black holes, live ephemerides and further hands-on experiments are not implemented. The legacy continent scenes remain in source but are outside the new entry.
+
+---
+
+## Historical verification for the previous exploration entry
+
 # Verification record
 
 Verified locally on 27 November 2026 in the Windows workspace. This is a **new independent project directory**, not a modification of an existing educational repository. The user subsequently designated the empty `tanjbmath/noviverse` GitHub repository for source upload and enabled branch-based Pages publishing. A repair adds a prebuilt root copy for that publishing method. Temporary local preview servers are used for testing.
