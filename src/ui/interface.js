@@ -13,6 +13,7 @@ export class Interface {
         <button class="brand" data-action="home" aria-label="NoviVerse home">${icon('star')}<span>Novi<span class="brand-light">Verse</span><small>A UNIVERSE OF DISCOVERIES</small></span></button>
         <nav class="utilities" aria-label="Explorer tools">
           <span id="location-chip" class="location-chip">SOLAR SYSTEM</span>
+          <button class="tool" data-action="audio" aria-label="Mute ambient sound" aria-pressed="false" title="Ambient planet sound">${icon('sound')}</button>
           <button class="tool" data-action="motion" aria-label="Reduce motion" aria-pressed="false" title="Reduce motion">${icon('motion')}</button>
           <button class="tool" data-action="about" aria-label="About the science">${icon('info')}</button>
           <button class="tool" data-action="home" aria-label="Return to space">${icon('home')}</button>
@@ -78,14 +79,23 @@ export class Interface {
       if (action === 'back') actions.back();
       if (action === 'close-discovery') actions.back();
       if (action === 'activity') actions.activity(this.activeDiscovery.activity);
+      if (action === 'surface-closeup') actions.surfaceCloseup?.();
       if (action === 'wonder-challenge') actions.wonderActivity?.();
       if (action === 'close-modal') this.closeModal();
       if (action === 'about') this.about();
       if (action === 'motion') actions.motion();
+      if (action === 'audio') actions.audio?.();
     });
     this.elements.modal.addEventListener('close', () => { if (!this.elements.modal.open) { this.cleanupModal?.(); this.cleanupModal = null; } });
     this.elements.modal.addEventListener('click', e => { if (e.target === this.elements.modal) { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) this.closeModal(); } });
     this.scratch = new THREE.Vector3();
+  }
+  setAudioMuted(muted) {
+    const button = document.querySelector('[data-action="audio"]');
+    if (!button) return;
+    button.setAttribute('aria-pressed', String(muted));
+    button.setAttribute('aria-label', muted ? 'Unmute ambient sound' : 'Mute ambient sound');
+    button.innerHTML = icon(muted ? 'soundOff' : 'sound');
   }
   status(text) { this.elements.status.textContent = text; }
   setBusy(busy, text = '') {
@@ -139,10 +149,12 @@ export class Interface {
   showDiscovery(id) {
     const d = discoveries[id]; this.activeDiscovery = d;
     this.previousFocus = document.activeElement;
+    if (this.kind === 'space') this.elements['location-chip'].textContent = 'SOLAR SYSTEM';
     this.elements.discovery.innerHTML = `<div class="discovery-top"><span class="discovery-symbol">${icon(d.icon)}</span><button class="tool" data-action="close-discovery" aria-label="Return to overview">${icon('close')}</button></div>
       <p class="eyebrow">${d.category}</p><h2 tabindex="-1">${d.title}</h2>
       <div class="stats">${d.stats.map(([value, label]) => `<div><strong>${value}</strong><small>${label}</small></div>`).join('')}</div>
       <p>${d.explanation}</p><div class="wonder"><span>${icon('star')} DID YOU KNOW?</span><p>${d.fact}</p></div>
+      ${d.surface ? `<button class="primary activity-button" data-action="surface-closeup">${icon('planet')} View surface close-up</button><p class="surface-hint">Or tap ${d.title} again to zoom in closer.</p>` : ''}
       ${d.activity ? `<button class="primary activity-button" data-action="activity">${icon('lab')}${d.activityTitle}</button>` : d === discoveries.earth ? '<span class="expansion">MORE ENVIRONMENTS · FUTURE EXPANSION</span>' : ''}
       <details><summary>A closer look</summary><p>${d.detail}</p></details>
       <details><summary>Science sources</summary><ul>${d.sourceIds.map(id => `<li><a href="${sources[id][1]}" target="_blank" rel="noopener noreferrer">${sources[id][0]}</a></li>`).join('')}</ul><small>Checked 27 November 2026</small></details>
@@ -152,10 +164,29 @@ export class Interface {
     this.elements.discovery.querySelector('h2').focus({ preventScroll: true });
     this.status(`Discovered ${d.title}.`);
   }
+  showSurfaceCloseup(id) {
+    const d = discoveries[id];
+    const surface = d?.surface;
+    if (!surface) return this.showDiscovery(id);
+    this.activeDiscovery = d;
+    this.previousFocus = document.activeElement;
+    this.elements['location-chip'].textContent = `SOLAR SYSTEM · ${d.title.toUpperCase()} SURFACE`;
+    this.elements.discovery.innerHTML = `<div class="discovery-top"><span class="discovery-symbol">${icon(d.icon)}</span><button class="tool" data-action="close-discovery" aria-label="Return to ${d.title} orbit">${icon('close')}</button></div>
+      <p class="eyebrow">${d.title.toUpperCase()} · SURFACE CLOSE-UP</p><h2 tabindex="-1">${surface.heading}</h2>
+      <div class="stats">${surface.stats.map(([value, label]) => `<div><strong>${value}</strong><small>${label}</small></div>`).join('')}</div>
+      <p>${surface.explanation}</p><div class="wonder"><span>${icon('star')} WHAT YOU SEE</span><p>${surface.clues}</p></div>
+      <details><summary>Science sources</summary><ul>${d.sourceIds.map(sid => `<li><a href="${sources[sid][1]}" target="_blank" rel="noopener noreferrer">${sources[sid][0]}</a></li>`).join('')}</ul><small>Checked 27 November 2026</small></details>
+      <button class="text-button" data-action="back">${icon('back')}Back to ${d.title} orbit</button>`;
+    this.elements.discovery.hidden = false;
+    document.body.classList.add('discovering');
+    this.elements.discovery.querySelector('h2').focus({ preventScroll: true });
+    this.status(`Viewing ${d.title} surface close-up.`);
+  }
   hideDiscovery() {
     this.activeDiscovery = null;
     this.elements.discovery.hidden = true;
     document.body.classList.remove('discovering');
+    if (this.kind === 'space') this.elements['location-chip'].textContent = 'SOLAR SYSTEM';
   }
   openModal(html, cleanup) {
     this.closeModal(); this.elements['modal-body'].innerHTML = html; this.cleanupModal = cleanup;

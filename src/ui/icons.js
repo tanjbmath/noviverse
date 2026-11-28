@@ -12,6 +12,8 @@ const paths = {
   lab: '<path d="M9 3h6m-5 0v7l-6 9a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2l-6-9V3M7 15h10"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/>',
   motion: '<path d="M3 7h10m-8 5h15M2 17h10"/><circle cx="18" cy="6" r="3"/>',
+  sound: '<path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7m2.8-9.8a9 9 0 0 1 0 12.6"/>',
+  soundOff: '<path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m21 9-6 6m0-6 6 6"/>',
   pause: '<path d="M8 5v14M16 5v14"/>',
 };
 export const icon = (name, cls = '') => `<svg class="icon ${cls}" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.star}</svg>`;

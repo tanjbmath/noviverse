@@ -6,15 +6,22 @@ import { createAsteroidBelt, createPlanetBody } from '../models/planets.js';
 import { createSun } from '../models/sun.js';
 import { atmosphere, starfield } from './shared.js';
 
+export const EARTH_ORBIT_SECONDS = 30;
+export const ORBIT_COMPRESSION = 0.55;
+
+export function compressedOrbitPeriod(realPeriodYears) {
+  return EARTH_ORBIT_SECONDS * (realPeriodYears ** ORBIT_COMPRESSION);
+}
+
 export const SOLAR_PLANETS = [
-  { id: 'mercury', name: 'Mercury', sub: 'Closest rocky world', orbit: 3.3, radius: 0.32, period: 38, phase: 0.65, spin: 0.04 },
-  { id: 'venus', name: 'Venus', sub: 'Cloud-wrapped twin', orbit: 4.7, radius: 0.50, period: 62, phase: 2.38, spin: -0.02 },
-  { id: 'earth', name: 'Earth', sub: 'Our blue home', orbit: 6.7, radius: 0.62, period: 150, phase: -0.45, spin: 0.055 },
-  { id: 'mars', name: 'Mars', sub: 'The red planet', orbit: 8.8, radius: 0.42, period: 125, phase: 1.2, spin: 0.055 },
-  { id: 'jupiter', name: 'Jupiter', sub: 'Largest gas giant', orbit: 12.6, radius: 1.15, period: 210, phase: -1.38, spin: 0.12 },
-  { id: 'saturn', name: 'Saturn', sub: 'Rings of ice & rock', orbit: 15.8, radius: 0.94, period: 290, phase: 0.34, spin: 0.11 },
-  { id: 'uranus', name: 'Uranus', sub: 'Tilted ice giant', orbit: 18.8, radius: 0.66, period: 380, phase: 2.82, spin: -0.07 },
-  { id: 'neptune', name: 'Neptune', sub: 'Windy blue giant', orbit: 21.4, radius: 0.64, period: 470, phase: -2.35, spin: 0.08 },
+  { id: 'mercury', name: 'Mercury', sub: 'Closest rocky world', orbit: 3.3, radius: 0.32, realPeriodYears: 0.2408, period: compressedOrbitPeriod(0.2408), phase: 0.65, spin: 0.04 },
+  { id: 'venus', name: 'Venus', sub: 'Cloud-wrapped twin', orbit: 4.7, radius: 0.50, realPeriodYears: 0.6152, period: compressedOrbitPeriod(0.6152), phase: 2.38, spin: -0.02 },
+  { id: 'earth', name: 'Earth', sub: 'Our blue home', orbit: 6.7, radius: 0.62, realPeriodYears: 1.0, period: compressedOrbitPeriod(1.0), phase: -0.45, spin: 0.055 },
+  { id: 'mars', name: 'Mars', sub: 'The red planet', orbit: 8.8, radius: 0.42, realPeriodYears: 1.8809, period: compressedOrbitPeriod(1.8809), phase: 1.2, spin: 0.055 },
+  { id: 'jupiter', name: 'Jupiter', sub: 'Largest gas giant', orbit: 12.6, radius: 1.15, realPeriodYears: 11.862, period: compressedOrbitPeriod(11.862), phase: -1.38, spin: 0.12 },
+  { id: 'saturn', name: 'Saturn', sub: 'Rings of ice & rock', orbit: 15.8, radius: 0.94, realPeriodYears: 29.457, period: compressedOrbitPeriod(29.457), phase: 0.34, spin: 0.11 },
+  { id: 'uranus', name: 'Uranus', sub: 'Tilted ice giant', orbit: 18.8, radius: 0.66, realPeriodYears: 84.021, period: compressedOrbitPeriod(84.021), phase: 2.82, spin: -0.07 },
+  { id: 'neptune', name: 'Neptune', sub: 'Windy blue giant', orbit: 21.4, radius: 0.64, realPeriodYears: 164.79, period: compressedOrbitPeriod(164.79), phase: -2.35, spin: 0.08 },
 ];
 
 export class SolarControls {
@@ -22,6 +29,7 @@ export class SolarControls {
     this.onChange = onChange;
     this.pose = { pitch: 27, yaw: 0, zoom: 1 };
     this.enabled = true;
+    this.orbitEnabled = true;
     this.pointers = new Map();
     this.moved = false;
     this.listeners = [];
@@ -40,6 +48,9 @@ export class SolarControls {
   setEnabled(enabled) {
     this.enabled = enabled;
     if (!enabled) this.clear();
+  }
+  setOrbitEnabled(enabled) {
+    this.orbitEnabled = enabled;
   }
   clear() {
     for (const id of this.pointers.keys()) {
@@ -74,6 +85,7 @@ export class SolarControls {
       const dx = e.clientX - p.x, dy = e.clientY - p.y;
       p.x = e.clientX; p.y = e.clientY;
       if (Math.hypot(p.x - p.startX, p.y - p.startY) > 6) this.moved = true;
+      if (!this.orbitEnabled) return;
       if (this.pointers.size === 1 && this.moved) {
         this.setPose({ yaw: this.pose.yaw - dx * 0.22, pitch: this.pose.pitch + dy * 0.18 });
       } else if (this.pointers.size === 2) {
@@ -91,7 +103,7 @@ export class SolarControls {
     listen('pointercancel', e => { this.moved = true; release(e); });
     listen('lostpointercapture', e => { this.pointers.delete(e.pointerId); });
     listen('wheel', e => {
-      if (!this.enabled) return;
+      if (!this.enabled || !this.orbitEnabled) return;
       e.preventDefault();
       const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 300 : 1;
       const dy = clamp(e.deltaY * unit, -120, 120);
@@ -139,6 +151,9 @@ export async function createSpace(engine) {
   scene.add(rimLight);
   const shipLight = new THREE.PointLight('#a4f9ed', 5.5, 10);
   scene.add(shipLight);
+  const inspectLight = new THREE.DirectionalLight('#fff2df', 0);
+  scene.add(inspectLight);
+  scene.add(inspectLight.target);
 
   const belt = createAsteroidBelt(9.9, 11.1, 220);
   scene.add(belt);
@@ -212,7 +227,7 @@ export async function createSpace(engine) {
     if (activeEngine && !motion.visitingPlanet) motion.applyCamera(activeEngine);
   });
 
-  const motion = createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, planets, belt, controls, shipLight, stars });
+  const motion = createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, planets, belt, controls, shipLight, inspectLight, stars });
 
   return {
     kind: 'space',
@@ -229,9 +244,13 @@ export async function createSpace(engine) {
       activeEngine = eng;
       controls.attach(eng.renderer.domElement);
       controls.setEnabled(true);
+      controls.setOrbitEnabled(!motion.visitingPlanet);
     },
     deactivate() { controls.dispose(); },
-    setInteractive(value) { controls.setEnabled(value && !motion.visitingPlanet); },
+    setInteractive(value) {
+      controls.setEnabled(value);
+      controls.setOrbitEnabled(value && !motion.visitingPlanet);
+    },
     ...motion,
   };
 }
@@ -241,7 +260,7 @@ function orbitOffset(phase) {
   return new THREE.Vector3(Math.cos(phase), Math.sin(phase) * Math.cos(0.45), -Math.sin(phase) * Math.sin(0.45));
 }
 
-export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, planets, belt, controls, shipLight, stars }) {
+export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, planets, belt, controls, shipLight, inspectLight, stars }) {
   let moonPhase = 0.65;
   let visitOrbitAngle = 0.9;
   let visitOrbitDir = -1;
@@ -258,6 +277,7 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
   const _lookMat = new THREE.Matrix4();
   const _posA = new THREE.Vector3();
   const _posB = new THREE.Vector3();
+  const _lightOffset = new THREE.Vector3(-3.2, 3.8, 4.2);
 
   const planetPhases = {};
   if (planets) {
@@ -277,22 +297,24 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
     orbit.position.copy(earth.position);
   };
 
-  const sampleOrbitPoint = (center, orbitR, angle, out) => out.set(
+  const sampleOrbitPoint = (center, orbitR, angle, out, surface = false, id = '') => out.set(
     center.x + Math.cos(angle) * orbitR,
-    center.y + Math.sin(angle + 0.35) * (orbitR * 0.22),
+    center.y + (surface && id === 'saturn' ? orbitR * 0.34 : 0) + Math.sin(angle + 0.35) * (orbitR * (surface ? 0.14 : 0.22)),
     center.z + Math.sin(angle) * orbitR,
   );
 
-  const planetOrbitPose = (id, angle, dir = visitOrbitDir) => {
+  const planetOrbitPose = (id, angle, dir = visitOrbitDir, surface = motion.visitingSurface) => {
     const p = planets?.[id];
     if (!p) return null;
     const r = p.radius * planetScale;
-    const orbitR = id === 'saturn' ? r * 2.62 : Math.max(r * 1.9, r + 0.58);
+    const orbitR = surface
+      ? (id === 'saturn' ? r * 1.32 : Math.max(r * 1.26, r + 0.24))
+      : (id === 'saturn' ? r * 2.62 : Math.max(r * 1.9, r + 0.58));
     const center = p.mesh.position;
-    const position = sampleOrbitPoint(center, orbitR, angle, new THREE.Vector3());
+    const position = sampleOrbitPoint(center, orbitR, angle, new THREE.Vector3(), surface, id);
     const eps = 0.01 * (dir < 0 ? -1 : 1);
-    sampleOrbitPoint(center, orbitR, angle - eps, _posA);
-    sampleOrbitPoint(center, orbitR, angle + eps, _posB);
+    sampleOrbitPoint(center, orbitR, angle - eps, _posA, surface, id);
+    sampleOrbitPoint(center, orbitR, angle + eps, _posB, surface, id);
     const tangent = _posB.clone().sub(_posA).normalize();
     _inward.copy(center).sub(position).normalize();
     _up.copy(_worldUp).addScaledVector(_inward, 0.36).normalize();
@@ -302,7 +324,7 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
   };
 
   const placeNoviOnPlanetOrbit = id => {
-    const pose = planetOrbitPose(id, visitOrbitAngle, visitOrbitDir);
+    const pose = planetOrbitPose(id, visitOrbitAngle, visitOrbitDir, motion.visitingSurface);
     if (!pose) return;
     novi.root.position.copy(pose.position);
     novi.root.quaternion.copy(pose.quaternion);
@@ -359,11 +381,15 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
 
   const motion = {
     visitingPlanet: null,
+    visitingSurface: false,
     setIdle(value) { idle = value; },
     resetVisitOrbit() { visitOrbitAngle = 0.9; visitOrbitDir = -1; },
     setVisitOrbit(angle, dir = -1) {
       visitOrbitAngle = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
       visitOrbitDir = dir < 0 ? -1 : 1;
+    },
+    getVisitOrbit() {
+      return { angle: visitOrbitAngle, dir: visitOrbitDir };
     },
     applyCamera(engine) {
       const view = computeOverview(lastWidth, lastHeight);
@@ -375,15 +401,15 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
       const noviPose = noviOverviewPose(width);
       return { ...view, noviPose };
     },
-    planetFocusView(id, width = lastWidth, fromPos = null) {
+    planetFocusView(id, width = lastWidth, fromPos = null, keepOrbit = null) {
       const p = planets?.[id];
       if (!p) return null;
       const mobile = width < 760;
       const center = p.mesh.position;
       const camDir = new THREE.Vector3(0.36, 0.34, 0.87).normalize();
-      let orbitAngle = 0.9;
-      let orbitDir = -1;
-      if (fromPos) {
+      let orbitAngle = keepOrbit ? keepOrbit.angle : 0.9;
+      let orbitDir = keepOrbit ? (keepOrbit.dir < 0 ? -1 : 1) : -1;
+      if (!keepOrbit && fromPos) {
         const dx = center.x - fromPos.x;
         const dz = center.z - fromPos.z;
         const len = Math.hypot(dx, dz);
@@ -405,7 +431,7 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
           orbitDir = -1;
         }
       }
-      const entry = planetOrbitPose(id, orbitAngle, orbitDir);
+      const entry = planetOrbitPose(id, orbitAngle, orbitDir, false);
       const { r } = entry;
       const dist = Math.max(4.4, r * (id === 'saturn' ? 7.2 : 5.8)) * (mobile ? 1.18 : 1);
       const position = center.clone().addScaledVector(camDir, dist);
@@ -418,8 +444,28 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
       const noviScale = clamp(r * 0.16, 0.11, 0.25);
       return { position, look, noviPos, noviLookAt, noviQuaternion, noviTangent, noviScale, orbitAngle, orbitDir, target: center.clone() };
     },
+    surfaceFocusView(id, width = lastWidth, fromOrbit = null) {
+      const p = planets?.[id];
+      if (!p) return null;
+      const mobile = width < 760;
+      const orbitDir = fromOrbit ? (fromOrbit.dir < 0 ? -1 : 1) : visitOrbitDir;
+      const baseAngle = fromOrbit ? fromOrbit.angle : visitOrbitAngle;
+      const orbitAngle = ((baseAngle + orbitDir * (fromOrbit ? 0.55 : 0)) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+      const entry = planetOrbitPose(id, orbitAngle, orbitDir, true);
+      const { r, center } = entry;
+      const camDir = new THREE.Vector3(0.28, id === 'saturn' ? 0.44 : 0.24, 0.88).normalize();
+      const dist = r * (id === 'saturn' ? 2.55 : 2.15) * (mobile ? 1.18 : 1);
+      const position = center.clone().addScaledVector(camDir, dist);
+      const look = center.clone().add(mobile ? new THREE.Vector3(0, -r * 0.44, 0) : new THREE.Vector3(r * 0.58, -r * 0.06, 0));
+      const noviPos = entry.position.clone();
+      const noviLookAt = entry.position.clone().add(entry.tangent);
+      const noviQuaternion = entry.quaternion.clone();
+      const noviTangent = entry.tangent.clone();
+      const noviScale = clamp(r * 0.115, 0.08, 0.16);
+      return { position, look, noviPos, noviLookAt, noviQuaternion, noviTangent, noviScale, orbitAngle, orbitDir, target: center.clone() };
+    },
     currentVisitPose() {
-      return this.visitingPlanet ? planetOrbitPose(this.visitingPlanet, visitOrbitAngle, visitOrbitDir) : null;
+      return this.visitingPlanet ? planetOrbitPose(this.visitingPlanet, visitOrbitAngle, visitOrbitDir, this.visitingSurface) : null;
     },
     resize(engine, width = innerWidth, height = innerHeight) {
       lastWidth = width;
@@ -473,7 +519,9 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
       }
 
       if (this.visitingPlanet) {
-        const focus = this.planetFocusView(this.visitingPlanet, width);
+        const focus = this.visitingSurface
+          ? this.surfaceFocusView(this.visitingPlanet, width)
+          : this.planetFocusView(this.visitingPlanet, width);
         if (focus) {
           engine.camera.position.copy(focus.position);
           engine.look.copy(focus.look);
@@ -496,14 +544,15 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
       if (!engine.paused) {
         if (planets) {
           for (const [id, p] of Object.entries(planets)) {
-            p.spinMesh.rotation.y += dt * p.spin;
+            const spinFactor = this.visitingSurface && id === this.visitingPlanet ? 0.55 : 1;
+            p.spinMesh.rotation.y += dt * p.spin * spinFactor;
             if (idle) {
               planetPhases[id] = (planetPhases[id] + dt * Math.PI * 2 / p.period) % (Math.PI * 2);
             }
           }
           if (idle) {
             placePlanets();
-            if (belt) belt.rotation.y += dt * 0.015;
+            if (belt) belt.rotation.y += dt * 0.075;
           }
         } else {
           earth.rotation.y += dt * 0.055;
@@ -513,10 +562,21 @@ export function createSpaceMotion({ earth, air, moon, sun, novi, orbit, solar, p
           placeMoon();
         }
         if (this.visitingPlanet && planets) {
-          visitOrbitAngle = (visitOrbitAngle + visitOrbitDir * dt * 0.85 + Math.PI * 2) % (Math.PI * 2);
+          const rate = this.visitingSurface ? 0.52 : 0.85;
+          visitOrbitAngle = (visitOrbitAngle + visitOrbitDir * dt * rate + Math.PI * 2) % (Math.PI * 2);
           placeNoviOnPlanetOrbit(this.visitingPlanet);
         } else if (shipLight) {
           shipLight.position.copy(novi.root.position).add(_ahead.set(0.4, 2.2, 2.4));
+        }
+      }
+      if (inspectLight) {
+        if (this.visitingPlanet && planets?.[this.visitingPlanet]) {
+          const center = planets[this.visitingPlanet].mesh.position;
+          inspectLight.position.copy(center).add(_lightOffset);
+          inspectLight.target.position.copy(center);
+          inspectLight.intensity = this.visitingSurface ? 1.15 : 0.78;
+        } else {
+          inspectLight.intensity = 0;
         }
       }
       novi.update(time, engine.paused, dt);

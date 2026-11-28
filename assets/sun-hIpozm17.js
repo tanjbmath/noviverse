@@ -1,4 +1,4 @@
-import{G as M,f as m,g as z,s as d,t as b,u as g,V as y,C as S,T as _,j as C}from"./three-BPz9HG03.js";const P=new y(-.42,.24,.875).normalize(),G=`varying vec3 p; varying vec3 n; varying vec3 eye;
+import{G as M,f as m,g as z,s as d,t as b,u as g,V as y,C as S,T as _,j as C}from"./three-CJqfZSyd.js";const P=new y(-.42,.24,.875).normalize(),G=`varying vec3 p; varying vec3 n; varying vec3 eye;
 void main(){p=normalize(position);n=normalize(normalMatrix*normal);
 vec4 mv=modelViewMatrix*vec4(position,1.);eye=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,I=`
 float hash(vec3 q){q=fract(q*.3183099+vec3(.17,.31,.53));q*=17.;return fract(q.x*q.y*q.z*(q.x+q.y+q.z));}

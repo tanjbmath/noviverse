@@ -124,6 +124,12 @@ export const discoveries = {
     explanation: 'Mercury is the closest planet to the Sun and only slightly wider than Earth’s Moon. With almost no atmosphere to hold warmth, sunlit ground bakes while the night side freezes.',
     fact: 'From Mercury’s surface, the Sun would look more than three times wider than it appears from Earth.',
     detail: 'Mercury’s cratered plains preserve billions of years of impacts alongside towering cliffs formed as its large iron core cooled and contracted. This view uses procedural surface shading rather than spacecraft imagery.',
+    surface: {
+      heading: 'What is Mercury’s surface made of?',
+      stats: [['Silicate rock', 'outer crust'], ['Dusty regolith', 'cratered surface']],
+      explanation: 'Mercury has a solid rocky crust made mostly of silicate minerals—similar to Earth’s dark volcanic rock—blanketed in a fine powder of crushed rock and dust called regolith. Deep beneath that thin rocky shell lies an enormous metallic iron core.',
+      clues: 'Countless overlapping impact basins, bright crater rims, and long wrinkled cliff scarps cover the gray landscape because there is almost no wind or rain to wear them away.',
+    },
     sourceIds: ['mercury'],
   },
   venus: {
@@ -132,6 +138,12 @@ export const discoveries = {
     explanation: 'Similar in size to Earth, Venus is wrapped in thick clouds of carbon dioxide and sulfuric acid. Its dense atmosphere traps heat in a runaway greenhouse effect, making Venus the hottest planet in our solar system.',
     fact: 'Venus rotates in the opposite direction to most planets, so the Sun rises in the west and sets in the east.',
     detail: 'Because bright clouds hide the ground in visible light, spacecraft use radar to map Venus’s vast volcanic plains and mountains. Colors here are an artistic illustration of its cloud deck.',
+    surface: {
+      heading: 'What is Venus’s surface made of?',
+      stats: [['Basalt lava plains', 'solid ground below'], ['Sulfuric clouds', 'visible outer deck']],
+      explanation: 'From space, we look down at dense clouds made of sulfuric acid droplets swirling in thick carbon dioxide gas. Hidden underneath those blinding clouds is solid ground made mostly of dark volcanic basalt rock, vast hardened lava plains, and rugged plateaus.',
+      clues: 'Thick, swirling cream-and-gold cloud chevrons sweep swiftly around the planet while high-pressure heat bakes the rocky volcanic plains far below.',
+    },
     sourceIds: ['venus'],
   },
   mars: {
@@ -140,6 +152,12 @@ export const discoveries = {
     explanation: 'Iron-rich dust gives Mars its rusty red color. It has seasons, polar ice caps, giant extinct volcanoes, and ancient valley networks showing that liquid water once flowed across its surface.',
     fact: 'Mars is home to Olympus Mons, a shield volcano roughly three times as tall as Mount Everest.',
     detail: 'Today Mars’s thin carbon-dioxide atmosphere leaves the surface cold and dry. Orbiters and rovers investigate layered rocks to read how Mars changed over time.',
+    surface: {
+      heading: 'What is Mars’s surface made of?',
+      stats: [['Iron-oxide dust', 'rusty red coating'], ['Basalt & polar ice', 'rock & frozen caps']],
+      explanation: 'Mars’s solid crust is mostly dark volcanic basalt rock covered by a thick layer of fine rusty dust rich in oxidized iron—the same chemical reaction that turns iron rusty on Earth. At its cold north and south poles sit bright caps of water ice and frozen carbon dioxide.',
+      clues: 'Rust-orange dust plains contrast with darker exposed basalt rock patches, carved canyon rifts, ancient craters, and gleaming white polar ice caps.',
+    },
     sourceIds: ['mars'],
   },
   jupiter: {
@@ -148,6 +166,12 @@ export const discoveries = {
     explanation: 'Jupiter is the largest planet in our solar system—more massive than all the other planets combined. Rapid rotation stretches its hydrogen, helium, and ammonia clouds into bright zones and dark belts.',
     fact: 'Jupiter’s Great Red Spot is a towering storm wider than Earth that has been swirling for centuries.',
     detail: 'Jupiter has no solid surface to stand on. Its four largest moons—Io, Europa, Ganymede, and Callisto—were first observed by Galileo Galilei in 1610.',
+    surface: {
+      heading: 'What is Jupiter’s outer layer made of?',
+      stats: [['Hydrogen & helium', 'deep gas body'], ['Ammonia clouds', 'visible swirling bands']],
+      explanation: 'Jupiter has no solid ground to land on. What looks like a surface up close is an ocean of swirling clouds made of frozen ammonia crystals and ammonia-sulfur compounds floating above deep, crushing layers of hydrogen and helium gas.',
+      clues: 'Alternating bright cloud zones, warm rust-brown belts, tiny white storm ovals, and the giant swirling Great Red Spot reveal relentless atmospheric winds.',
+    },
     sourceIds: ['jupiter'],
   },
   saturn: {
@@ -156,6 +180,12 @@ export const discoveries = {
     explanation: 'Saturn is a gas giant celebrated for its dazzling ring system. Rather than solid hoops, the rings are made of billions of chunks of water ice and rocky debris orbiting together.',
     fact: 'Saturn’s average density is lower than liquid water’s—mostly because the planet is composed of light hydrogen and helium gas.',
     detail: 'Though Saturn’s main rings span hundreds of thousands of kilometers across, they are typically only tens of meters thick. Moons sculpt gaps such as the Cassini Division.',
+    surface: {
+      heading: 'What is Saturn’s outer layer made of?',
+      stats: [['Hydrogen & helium', 'gas giant body'], ['Ammonia haze', 'golden cloud tops']],
+      explanation: 'Like Jupiter, Saturn has no solid surface—just gradually thickening layers of hydrogen and helium gas topped by pale gold clouds of frozen ammonia crystals and misty haze. Overhead, its famous rings are made of billions of bright water-ice chunks and rocky dust.',
+      clues: 'Silky butterscotch cloud bands ripple beneath the planet’s glowing limb while icy ring particles catch sunlight above the equator.',
+    },
     sourceIds: ['saturn'],
   },
   uranus: {
@@ -164,6 +194,12 @@ export const discoveries = {
     explanation: 'Uranus is an ice giant whose deep interior holds hot, dense fluids of water, ammonia, and methane. Methane gas in its upper atmosphere absorbs red light, giving Uranus its calm cyan-blue color.',
     fact: 'Uranus spins nearly on its side, giving each pole around 42 years of continuous sunlight followed by 42 years of winter darkness.',
     detail: 'Like the other giant planets, Uranus has a ring system—13 narrow, faint rings circling its tilted equator almost vertically.',
+    surface: {
+      heading: 'What is Uranus’s outer layer made of?',
+      stats: [['Hydrogen & helium', 'upper atmosphere'], ['Methane & ices', 'cyan haze & mantle']],
+      explanation: 'Uranus has no solid crust. Its serene cyan-blue cloud tops are made of cold hydrogen and helium gas laced with frozen methane crystals—which absorb red sunlight and reflect blue-green light—sitting above a deep hot mantle of water, ammonia, and methane fluids.',
+      clues: 'Soft aquamarine haze bands wrap calmly around the tilted globe with a pale polar hood and faint, nearly vertical dust rings.',
+    },
     sourceIds: ['uranus'],
   },
   neptune: {
@@ -172,6 +208,12 @@ export const discoveries = {
     explanation: 'Orbiting 30 times farther from the Sun than Earth, Neptune is a cold, deep-blue ice giant swept by supersonic winds. It was the first planet found by mathematical prediction before being spotted through a telescope.',
     fact: 'Neptune completed its very first full orbit around the Sun since its 1846 discovery in 2011.',
     detail: 'Even with faint sunlight at the edge of the planetary system, internal heat powers bright high-altitude methane clouds and shifting dark storms.',
+    surface: {
+      heading: 'What is Neptune’s outer layer made of?',
+      stats: [['Methane ice clouds', 'bright high streaks'], ['Water & ammonia', 'dense icy mantle']],
+      explanation: 'Neptune has no solid surface either. Its vivid cobalt-blue outer atmosphere is made of hydrogen, helium, and methane gas topped with bright wispy clouds of frozen methane crystals, floating above a super-pressurized interior of water, ammonia, and methane ices.',
+      clues: 'Streaks of icy white cirrus clouds and dark churning vortices race across deep sapphire cloud bands driven by supersonic winds.',
+    },
     sourceIds: ['neptune'],
   },
   photosphere: {

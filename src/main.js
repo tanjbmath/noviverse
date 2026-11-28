@@ -2,19 +2,26 @@ import * as THREE from 'three';
 import './style.css';
 import { Engine } from './core/engine.js';
 import { disposeScene } from './core/dispose.js';
+import { PlanetSoundEngine } from './core/soundscape.js';
 import { Interface } from './ui/interface.js';
 import { discoveries } from './data/discoveries.js';
 import { earthSites, earthRegions } from './data/earth.js';
 
 const app = document.querySelector('#app');
+const sound = new PlanetSoundEngine();
 let engine, world, operation = new AbortController(), busy = true, reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const ui = new Interface(app, {
   destination: id => destination(id), poi: id => inspect(id), home: () => home(), back: () => back(),
   motion: () => { reduced = !reduced; applyMotion(); },
+  audio: () => ui.setAudioMuted(sound.toggleMute()),
   earthControl: action => { if (!busy && world?.kind === 'earth' && !ui.activeDiscovery) world.navigateControl(action); },
   activity: id => runActivity(id),
+  surfaceCloseup: () => { if (!busy && world?.kind === 'space' && world.visitingPlanet && !world.visitingSurface) surfaceCloseup(world.visitingPlanet); },
   wonderActivity: () => { if (!busy && world?.kind === 'wonder') runActivity(`wonder:${world.siteId}`); },
 });
+addEventListener('pointerdown', () => sound.unlock(), { passive: true });
+addEventListener('keydown', () => sound.unlock(), { passive: true });
+document.addEventListener('visibilitychange', () => sound.setHidden(document.hidden));
 async function runActivity(id) {
   const signal = operation.signal;
   try {
@@ -112,10 +119,12 @@ function applyFlightPose(novi, curve, { fromQuat, toQuat, scaleFrom, scaleTo, en
 async function home(initial = false) {
   if (!engine) return;
   const signal = begin(initial ? 'Preparing a universe of discoveries…' : 'Heading home to our blue planet…');
+  sound.setTarget(null);
   try {
     if (world?.kind === 'space') {
       world.controls?.reset();
       world.visitingPlanet = null;
+      world.visitingSurface = false;
       world.setIdle(true);
       world.resize(engine);
       world.novi.resetMotion?.();
@@ -148,9 +157,51 @@ async function home(initial = false) {
 
 const SOLAR_PLANET_IDS = new Set(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
 
+async function surfaceCloseup(id) {
+  if (busy || world?.kind !== 'space' || !SOLAR_PLANET_IDS.has(id)) return;
+  const signal = begin(`Descending closer to ${discoveries[id].title}’s surface…`);
+  sound.unlock();
+  sound.setTarget(id, { closeup: true });
+  try {
+    world.novi.setMoving(true);
+    const orbit = world.getVisitOrbit?.() || { angle: 0.9, dir: -1 };
+    const visitPose = world.currentVisitPose?.();
+    const shipFrom = world.novi.root.position.clone();
+    const qFrom = world.novi.root.quaternion.clone();
+    const scaleFrom = world.novi.root.scale.x;
+    const focus = world.surfaceFocusView(id, innerWidth, orbit);
+    const startDir = (visitPose?.tangent || new THREE.Vector3(0, 0, 1).applyQuaternion(qFrom)).clone().normalize();
+    const curve = makeFlightCurve(shipFrom, focus.noviPos, startDir, focus.noviTangent, 0.03);
+    world.setVisitOrbit?.(focus.orbitAngle, focus.orbitDir);
+    const flight = engine.animate(duration(1.35), (t, rawT) => {
+      const u = cruiseProgress(rawT ?? t, 0.35);
+      applyFlightPose(world.novi, curve, {
+        fromQuat: qFrom,
+        toQuat: focus.noviQuaternion,
+        scaleFrom,
+        scaleTo: focus.noviScale,
+        endBlendStart: 0.62,
+        bankGain: 2.0,
+      }, u);
+    }, signal);
+    await engine.view(focus.position, focus.look, duration(1.35), signal);
+    await flight;
+    if (signal.aborted) return;
+    world.visitingPlanet = id;
+    world.visitingSurface = true;
+    settle();
+    world.novi.setMoving(true);
+    ui.showSurfaceCloseup(id);
+  } catch (error) { if (!signal.aborted) report(error); }
+}
+
 async function destination(id) {
   if (busy || !world || !['moon', 'earth', 'sun', ...SOLAR_PLANET_IDS].includes(id)) return;
   if (world.kind !== 'space') return;
+  if (world.visitingPlanet === id && SOLAR_PLANET_IDS.has(id)) {
+    if (!world.visitingSurface) await surfaceCloseup(id);
+    return;
+  }
   const signal = begin(
     id === 'moon'
       ? 'Course set for the Moon. Let’s follow our curiosity.'
@@ -159,8 +210,11 @@ async function destination(id) {
         : `Flying to our ${id === 'earth' ? 'Earth' : 'Sun'} viewing point…`,
   );
   try {
+    sound.unlock();
     world.novi.setMoving(true);
     if (SOLAR_PLANET_IDS.has(id)) {
+      sound.setTarget(id, { closeup: false });
+      world.visitingSurface = false;
       world.resetVisitOrbit?.();
       const shipFrom = world.novi.root.position.clone();
       const focus = world.planetFocusView(id, innerWidth, shipFrom);
@@ -189,6 +243,7 @@ async function destination(id) {
       await flight;
       if (signal.aborted) return;
       world.visitingPlanet = id;
+      world.visitingSurface = false;
       settle();
       world.novi.setMoving(true);
       ui.showDiscovery(id);
@@ -219,7 +274,7 @@ async function destination(id) {
       const result = await nextPromise;
       if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
       if (result.error) throw result.error;
-      swap(result.value); world.novi.resetMotion?.(); settle(); ui.status('Welcome to the solar observatory. Tap a glowing node to investigate our star.'); return;
+      swap(result.value); sound.setTarget('sun', { closeup: false }); world.novi.resetMotion?.(); settle(); ui.status('Welcome to the solar observatory. Tap a glowing node to investigate our star.'); return;
     }
     if (id === 'earth') {
       const nextPromise = import('./scenes/earth.js').then(m => m.createEarth(engine)).then(value => ({ value }), error => ({ error }));
@@ -246,7 +301,7 @@ async function destination(id) {
       const result = await nextPromise;
       if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
       if (result.error) throw result.error;
-      swap(result.value); world.novi.resetMotion?.(); ui.earthRegion(null); settle();
+      swap(result.value); sound.setTarget('earth', { closeup: false }); world.novi.resetMotion?.(); ui.earthRegion(null); settle();
       ui.status('Welcome to Earth. Drag, swipe or scroll to turn the globe. Tap a glowing node to explore the first continent.'); return;
     }
     const nextPromise = import('./scenes/moon.js').then(m => m.createMoon(engine)).then(value => ({ value }), error => ({ error }));
@@ -281,15 +336,18 @@ async function destination(id) {
     }, signal);
     if (signal.aborted) return;
     world.novi.root.rotation.set(0, -0.5, 0);
+    sound.setTarget('moon', { closeup: false });
     settle(); ui.status('Welcome to the Tycho region. Tap a crater, rock, or the gravity lab. Novi’s hovercraft is fictional.');
   } catch (error) { if (!signal.aborted) report(error); }
 }
 
 async function inspect(id) {
+  sound.unlock();
   if (world?.kind === 'wonder') {
     if (busy || !world.labels.some(label => label.id === id)) return;
     const signal = begin(`Novi is investigating ${discoveries[id].title}…`);
     try {
+      sound.setTarget('earth', { closeup: true });
       if (!await world.focus(id, engine, duration(1.6), signal)) return;
       world.resize(engine); settle(); world.novi.setScanning(true); ui.showDiscovery(id);
     } catch (error) { if (!signal.aborted) report(error); }
@@ -307,6 +365,7 @@ async function inspect(id) {
         if (signal.aborted) { if (result.value) disposeScene(result.value.scene); return; }
         if (result.error) throw result.error;
         swap(result.value); ui.wonder(world.siteId);
+        sound.setTarget('earth', { closeup: false });
         ui.setBusy(true, 'Wings folding. Boots deploying. Novi’s Earth explorer is ready!');
         world.novi.setMoving(true); const landed = world.overviewPose();
         await engine.animate(duration(1.8), t => {
@@ -318,13 +377,14 @@ async function inspect(id) {
       }
       if (!await world.focus(id, engine, duration(1.7), signal)) return;
       ui.world('earth', world.labels); ui.earthRegion(world.region); settle();
-      if (world.visiting) { world.novi.setScanning(true); ui.showDiscovery(id); }
+      if (world.visiting) { world.novi.setScanning(true); sound.setTarget('earth', { closeup: true }); ui.showDiscovery(id); }
       else ui.status('Our next continent is ready. Explore a glowing node, or turn the globe to look around.');
     } catch (error) { if (!signal.aborted) report(error); }
     return;
   }
   if (busy || !['moon', 'sun'].includes(world?.kind) || !world.labels.some(label => label.id === id)) return;
   const signal = begin(`Novi is heading to ${discoveries[id].title}…`);
+  sound.setTarget(world.kind, { closeup: true });
   world.visiting = true; world.novi.setMoving(true);
   if (world.kind === 'sun') {
     const anchor = world.labels.find(label => label.id === id).object.position;
@@ -392,6 +452,7 @@ async function back() {
   if (busy) return;
   if (world?.kind === 'wonder') {
     const signal = begin(world.visiting ? 'Returning to our lookout…' : 'Folding our explorer boots. Returning to the continent…');
+    sound.setTarget('earth', { closeup: false });
     try {
       if (world.visiting) {
         if (!await world.focus(null, engine, duration(1.2), signal)) return;
@@ -417,6 +478,7 @@ async function back() {
     if (!world.region) { await home(); return; }
     const target = world.visiting ? world.region : 'globe';
     const signal = begin(target === 'globe' ? 'Returning to our Earth overview…' : 'Returning to the continent overview…');
+    sound.setTarget('earth', { closeup: false });
     try {
       if (!await world.focus(target, engine, duration(1.2), signal)) return;
       ui.world('earth', world.labels); ui.earthRegion(world.region); settle();
@@ -425,6 +487,7 @@ async function back() {
   }
   if (world?.kind === 'sun') {
     const signal = begin('Returning to our solar viewing point…');
+    sound.setTarget('sun', { closeup: false });
     const view = world.view(), from = world.novi.root.position.clone();
     const to = new THREE.Vector3(-5, -3.7, 5);
     const qFrom = world.novi.root.quaternion.clone();
@@ -440,8 +503,46 @@ async function back() {
     if (signal.aborted) return;
     world.visiting = false; settle(); return;
   }
+  if (world?.kind === 'space' && world.visitingPlanet && world.visitingSurface) {
+    const id = world.visitingPlanet;
+    const signal = begin(`Pulling back to ${discoveries[id].title} orbit…`);
+    sound.setTarget(id, { closeup: false });
+    try {
+      const orbit = world.getVisitOrbit?.() || { angle: 0.9, dir: -1 };
+      const nextOrbit = { angle: orbit.angle + orbit.dir * 0.45, dir: orbit.dir };
+      const visitPose = world.currentVisitPose?.();
+      const shipFrom = world.novi.root.position.clone();
+      const qFrom = world.novi.root.quaternion.clone();
+      const scaleFrom = world.novi.root.scale.x;
+      const focus = world.planetFocusView(id, innerWidth, null, nextOrbit);
+      const startDir = (visitPose?.tangent || new THREE.Vector3(0, 0, 1).applyQuaternion(qFrom)).clone().normalize();
+      const curve = makeFlightCurve(shipFrom, focus.noviPos, startDir, focus.noviTangent, 0.04);
+      world.visitingSurface = false;
+      world.setVisitOrbit?.(focus.orbitAngle, focus.orbitDir);
+      world.novi.setMoving(true);
+      const flight = engine.animate(duration(1.2), (t, rawT) => {
+        const u = cruiseProgress(rawT ?? t, 0.35);
+        applyFlightPose(world.novi, curve, {
+          fromQuat: qFrom,
+          toQuat: focus.noviQuaternion,
+          scaleFrom,
+          scaleTo: focus.noviScale,
+          endBlendStart: 0.62,
+          bankGain: 2.0,
+        }, u);
+      }, signal);
+      await engine.view(focus.position, focus.look, duration(1.2), signal);
+      await flight;
+      if (signal.aborted) return;
+      settle();
+      world.novi.setMoving(true);
+      ui.showDiscovery(id);
+    } catch (error) { if (!signal.aborted) report(error); }
+    return;
+  }
   if (world?.kind === 'space' && world.visitingPlanet) {
     const signal = begin('Pulling back to the solar system overview…');
+    sound.setTarget(null);
     try {
       const overview = world.overviewPose();
       const visitPose = world.currentVisitPose?.();
@@ -453,6 +554,7 @@ async function back() {
       const endDir = overview.noviPose.position.clone().sub(shipFrom).normalize();
       const curve = makeFlightCurve(shipFrom, overview.noviPose.position, startDir, endDir, 0.1);
       world.visitingPlanet = null;
+      world.visitingSurface = false;
       world.novi.setMoving(true);
       const flight = engine.animate(duration(1.35), t => {
         applyFlightPose(world.novi, curve, {
@@ -476,6 +578,7 @@ async function back() {
   }
   if (world?.kind !== 'moon') { await home(); return; }
   const signal = begin('Pulling back for a little perspective…');
+  sound.setTarget('moon', { closeup: false });
   const destination = world.overviewPosition();
   await engine.view(destination, new THREE.Vector3(0, 0, -0.5), duration(1.2), signal);
   if (signal.aborted) return;
