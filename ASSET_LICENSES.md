@@ -20,11 +20,3 @@ The original local source remains available for the user's project. No separate 
 ## Earth wonder artwork
 
 `public/wonders/merapi.jpg`, `himalayas.jpg` and `borneo.jpg` are original AI-generated illustrations made separately for NoviVerse using the built-in image generation tool. Each full 1536 × 1024 image was converted to an optimized JPEG without cropping. They are not photographs, satellite products or surveyed reconstructions. No NASA/USGS/UNESCO endorsement is implied. Generation briefs are preserved in `docs/wonder-art-prompts.md`; hashes and sizes are recorded in `public/asset-manifest.json`. The background illustration and the animated 3D Novi model are separate scene elements.
-
-## Astronomy revamp · 28 November 2026
-
-The seven new maps `mercury.jpg`, `venus_atmosphere.jpg`, `mars.jpg`, `jupiter.jpg`, `saturn.jpg`, `uranus.jpg` and `neptune.jpg` in `public/textures/` are by **Solar System Scope / INOVE**, distributed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) on their [official texture page](https://www.solarsystemscope.com/textures/). Each original `2k_*.jpg` was downloaded from that page, resized from 2048 × 1024 to 1536 × 768 and JPEG recompressed at quality 85. Colors were not changed locally. The publisher describes enhanced colors and fictional reconstruction of unmapped gaps. Credits, source links and modification notices are available in the in-app help and science panels. The asset manifest records individual source URLs and hashes.
-
-`src/models/rocket.js` is original detailed 3D artwork: spline/lathe hull, swept extruded fins, recessed porthole, eyes and smile, separate fasteners, bands, vents, engine nozzle and layered exhaust. Saturn’s rings are original shader artwork. These are native Three.js models, not image placeholders. No new dependency, font download, purchased model or external runtime image URL was added.
-
-`earth-orbit.jpg` is a 2048 × 1024, quality-87 JPEG derivative of the credited NASA Blue Marble map, used by the current astronomy entry to reduce startup transfers and texture memory. The original `earth.jpg` remains unchanged for legacy scenes. Both are recorded in the asset manifest.

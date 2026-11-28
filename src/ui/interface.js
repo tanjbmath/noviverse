@@ -12,17 +12,16 @@ export class Interface {
       <header class="topbar">
         <button class="brand" data-action="home" aria-label="NoviVerse home">${icon('star')}<span>Novi<span class="brand-light">Verse</span><small>A UNIVERSE OF DISCOVERIES</small></span></button>
         <nav class="utilities" aria-label="Explorer tools">
-          <span id="location-chip" class="location-chip">SPACE EXPLORER</span>
+          <span id="location-chip" class="location-chip">SOLAR SYSTEM</span>
           <button class="tool" data-action="motion" aria-label="Reduce motion" aria-pressed="false" title="Reduce motion">${icon('motion')}</button>
           <button class="tool" data-action="about" aria-label="About the science">${icon('info')}</button>
           <button class="tool" data-action="home" aria-label="Return to space">${icon('home')}</button>
         </nav>
       </header>
       <section class="space-intro" id="space-intro">
-        <p class="eyebrow"><span></span> BIG QUESTIONS. LITTLE EXPLORER.</p>
-        <h1>A little curiosity.<br>A whole <em>universe.</em></h1>
-        <p class="intro-copy">Hi, I’m Novi! See a glowing node?<br>Tap it and let’s find out what’s there.</p>
-        <p class="micro">Just tap to travel. Wonder takes it from there.</p>
+        <p class="eyebrow"><span></span> SOLAR SYSTEM</p>
+        <h1>Explore <em>our</em> worlds.</h1>
+        <p class="intro-copy">Tap a glowing node to fly with Novi.</p>
       </section>
       <section class="moon-intro" id="moon-intro" hidden>
         <button class="text-button" data-action="home">${icon('back')} Back to space</button>
@@ -107,8 +106,8 @@ export class Interface {
     this.elements['wonder-intro'].hidden = kind !== 'wonder';
     this.elements['earth-controls'].hidden = kind !== 'earth';
     this.elements['novi-message'].hidden = kind !== 'space';
-    this.elements['location-chip'].textContent = kind === 'space' ? 'SPACE EXPLORER' : kind === 'sun' ? 'SUN · SOLAR OBSERVATORY' : kind === 'earth' ? 'EARTH · GLOBE EXPLORER' : 'MOON · TYCHO REGION';
-    this.elements['field-note'].innerHTML = kind === 'space' ? 'A playful universe. Real science. <span>Sizes & distances are not to scale.</span>' : kind === 'sun' ? 'Illustrated solar view · Colors & activity are artistic. <span>Novi’s viewing position is fictional. Never look directly at the real Sun.</span>' : kind === 'earth' ? 'NASA Earth imagery · Turn the globe to see the continents. <span>Asia is our first discovery region. Imagery is a historical composite.</span>' : 'Artistic Tycho diorama · Novi’s hovercraft is fictional. <span>Geography & travel compressed. Rocks are representative.</span>';
+    this.elements['location-chip'].textContent = kind === 'space' ? 'SOLAR SYSTEM' : kind === 'sun' ? 'SUN · SOLAR OBSERVATORY' : kind === 'earth' ? 'EARTH · GLOBE EXPLORER' : 'MOON · TYCHO REGION';
+    this.elements['field-note'].innerHTML = kind === 'space' ? 'Our solar system · Real NASA science. <span>Sizes, speeds & orbital distances are not to scale.</span>' : kind === 'sun' ? 'Illustrated solar view · Colors & activity are artistic. <span>Novi’s viewing position is fictional. Never look directly at the real Sun.</span>' : kind === 'earth' ? 'NASA Earth imagery · Turn the globe to see the continents. <span>Asia is our first discovery region. Imagery is a historical composite.</span>' : 'Artistic Tycho diorama · Novi’s hovercraft is fictional. <span>Geography & travel compressed. Rocks are representative.</span>';
     this.labels = labels;
     this.elements.labels.innerHTML = labels.map(label => `<button class="explore-node" aria-label="Explore ${label.text}" data-${kind === 'space' ? 'destination' : 'poi'}="${label.id}"><span class="target-dot" aria-hidden="true"></span></button>`).join('');
     this.labelButtons = [...this.elements.labels.children];
@@ -174,7 +173,7 @@ export class Interface {
       <p>Tap a world or a glowing node to discover its name and science. Novi navigates automatically. Back returns to the overview; Home returns to space. All destinations are open from the beginning. Nothing is saved.</p>
       <h3>Art & imagery credits</h3><p>Earth: NASA Earth Observatory, Blue Marble Next Generation (July 2004), Reto Stöckli. Moon: NASA / GSFC / Arizona State University, LRO CGI Moon Kit, Ernie Wright. Novi, equipment, terrain and interface are original code-authored artwork.</p>
       <p><a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a> · <a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noopener noreferrer">Moon map credits</a></p>
-      <p class="muted">Explore the Moon and the solar observatory. Earth has a turnable globe and three illustrated Asia locations with an animated 3D walking explorer, feature discoveries and challenges. These scenic locations combine illustrated artwork with 3D characters; they are not reconstructed terrain. Other continents and underground exploration remain planned. Solar plasma, glare and magnetic loops are authored illustrations, not live imagery or a physical simulation. No accounts, analytics, storage, or backend services.</p>`);
+      <p class="muted">Explore all eight planets in the solar system overview, then dive deeper into the Sun’s solar observatory, the Moon’s Tycho diorama, and Earth’s turnable globe with three illustrated Asia locations featuring an animated 3D walking explorer, feature discoveries and challenges. Other continents and planetary landings remain planned. Solar plasma, glare, rings, and planetary cloud textures (except NASA’s Earth and Moon maps) are authored illustrations, not live imagery or a physical ephemeris. No accounts, analytics, storage, or backend services.</p>`);
   }
   error(message) {
     this.setBusy(false); this.openModal(`<p class="eyebrow">A LITTLE SPACE WEATHER</p><h2 id="modal-title">We couldn’t draw this world.</h2><p>${message}</p><p>Try reloading in a browser with WebGL2 enabled. If a texture failed to load, check that the textures folder is served with the site.</p><button class="primary" onclick="location.reload()">Try again</button><p><a href="https://science.nasa.gov/moon/">Explore Moon science at NASA</a></p>`);

@@ -1,5 +1,5 @@
 {
-  "verifiedOn": "2026-11-28",
+  "verifiedOn": "2026-11-27",
   "assets": [
     {
       "file": "textures/earth.jpg",
@@ -55,81 +55,6 @@
       "source": "Original project artwork; generation prompts recorded in docs/wonder-art-prompts.md",
       "usage": "Project artwork, educational illustration; not a photograph or surveyed reconstruction",
       "modifications": "Generated separately, full frame preserved; converted to optimized JPEG, no sprite-sheet extraction."
-    },
-    {
-      "file": "textures/mercury.jpg",
-      "bytes": 259478,
-      "sha256": "7cd3a6fb319b722d3c770929a3574d7e4ab2331ca7702442bc1738646281cb7d",
-      "source": "https://www.solarsystemscope.com/textures/download/2k_mercury.jpg",
-      "license": "CC BY 4.0",
-      "credit": "Solar System Scope / INOVE",
-      "modifications": "Resized to 1536 \u00d7 768 and JPEG recompressed; colors unchanged."
-    },
-    {
-      "file": "textures/venus_atmosphere.jpg",
-      "bytes": 69269,
-      "sha256": "f36396fd06d195a67aaae8542f3f272105eda5a3e4c8c1d48edde6aa0e1a2d87",
-      "source": "https://www.solarsystemscope.com/textures/download/2k_venus_atmosphere.jpg",
-      "license": "CC BY 4.0",
-      "credit": "Solar System Scope / INOVE",
-      "modifications": "Resized to 1536 \u00d7 768 and JPEG recompressed; colors unchanged."
-    },
-    {
-      "file": "textures/mars.jpg",
-      "bytes": 192895,
-      "sha256": "ef35a1187c21a3fdb036ea6d87fc38fa7d5d62c8f4595365e8609f38a50661e1",
-      "source": "https://www.solarsystemscope.com/textures/download/2k_mars.jpg",
-      "license": "CC BY 4.0",
-      "credit": "Solar System Scope / INOVE",
-      "modifications": "Resized to 1536 \u00d7 768 and JPEG recompressed; colors unchanged."
-    },
-    {
-      "file": "textures/jupiter.jpg",
-      "bytes": 149262,
-      "sha256": "1cc73181a460661160d14f939a30cc22c046e8c35ff7fc6d29d750a8b0e77223",
-      "source": "https://www.solarsystemscope.com/textures/download/2k_jupiter.jpg",
-      "license": "CC BY 4.0",
-      "credit": "Solar System Scope / INOVE",
-      "modifications": "Resized to 1536 \u00d7 768 and JPEG recompressed; colors unchanged."
-    },
-    {
-      "file": "textures/saturn.jpg",
-      "bytes": 62286,
-      "sha256": "21f7e9094fa1b2f7c0c2bd8e79c30758f9709235c9d8062545724909006c01cd",
-      "source": "https://www.solarsystemscope.com/textures/download/2k_saturn.jpg",
-      "license": "CC BY 4.0",
-      "credit": "Solar System Scope / INOVE",
-      "modifications": "Resized to 1536 \u00d7 768 and JPEG recompressed; colors unchanged."
-    },
-    {
-      "file": "textures/uranus.jpg",
-      "bytes": 15209,
-      "sha256": "78142e1e676e47835381d12a3e6db10a1b75db5ea00d97c1db48c52f9a5f9d49",
-      "source": "https://www.solarsystemscope.com/textures/download/2k_uranus.jpg",
-      "license": "CC BY 4.0",
-      "credit": "Solar System Scope / INOVE",
-      "modifications": "Resized to 1536 \u00d7 768 and JPEG recompressed; colors unchanged."
-    },
-    {
-      "file": "textures/neptune.jpg",
-      "bytes": 32861,
-      "sha256": "4a3b727f064cf8f7779e2d1b492048b44799f70570939e1cedd22acf5e6c1b28",
-      "source": "https://www.solarsystemscope.com/textures/download/2k_neptune.jpg",
-      "license": "CC BY 4.0",
-      "credit": "Solar System Scope / INOVE",
-      "modifications": "Resized to 1536 \u00d7 768 and JPEG recompressed; colors unchanged."
-    },
-    {
-      "file": "textures/earth-orbit.jpg",
-      "sha256": "b12970f3c62816313642c473a75a17ee50756bcbd531f2dd0ec04260e20dd2fe",
-      "bytes": 229824,
-      "title": "Blue Marble Next Generation, July 2004",
-      "credit": "NASA Earth Observatory / Reto St\u00f6ckli",
-      "source": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/",
-      "download": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/july/world.200407.3x5400x2700.jpg",
-      "usage": "NASA educational/informational media usage permission; no endorsement implied",
-      "terms": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
-      "modifications": "Resized to 2048 \u00d7 1024 and JPEG recompressed at quality 87. Original retained as earth.jpg for legacy scenes."
     }
   ]
 }

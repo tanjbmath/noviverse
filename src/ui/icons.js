@@ -6,6 +6,7 @@ const paths = {
   earth: '<circle cx="12" cy="12" r="9"/><path d="m5 5 5 2 1 4-4 1-2 4m15-8-6 2 1 5 4 2M12 20l-1-5"/>',
   moon: '<path d="M20.6 14A9 9 0 0 1 10 3.4 9 9 0 1 0 20.6 14Z"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/>',
+  planet: '<circle cx="12" cy="12" r="5.5"/><ellipse cx="12" cy="12" rx="10.5" ry="3.4" transform="rotate(-22 12 12)"/>',
   crater: '<ellipse cx="12" cy="13" rx="10" ry="6"/><path d="M5 13c2 5 12 5 14 0M9 13l3-4 3 4"/>',
   rock: '<path d="m3 15 3-10 10-2 6 10-5 8-10-1Z"/><path d="m6 5 5 8 11 0m-11 0-4 7m4-7 5-10"/>',
   lab: '<path d="M9 3h6m-5 0v7l-6 9a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2l-6-9V3M7 15h10"/>',

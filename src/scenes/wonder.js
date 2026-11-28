@@ -53,7 +53,19 @@ export async function createWonder(siteId, engine, options = {}) {
       novi.setMoving(true);
       const walk = e.animate(seconds, t => {
         novi.root.position.lerpVectors(from, to, t);
-        novi.root.rotation.y = t < .9 && Math.abs(to.x - from.x) > .1 ? Math.sign(to.x - from.x) * Math.PI / 2 : .12;
+        const dx = to.x - from.x;
+        if (Math.abs(dx) > 0.1) {
+          const walkYaw = Math.sign(dx) * Math.PI / 2;
+          const turnIn = THREE.MathUtils.smoothstep(t, 0, 0.22);
+          const turnOut = THREE.MathUtils.smoothstep(t, 0.76, 1);
+          novi.root.rotation.y = THREE.MathUtils.lerp(
+            THREE.MathUtils.lerp(0.12, walkYaw, turnIn),
+            0.12,
+            turnOut,
+          );
+        } else {
+          novi.root.rotation.y = 0.12;
+        }
       }, signal);
       const camera = e.view(view.position, view.look, seconds, signal);
       await Promise.all([walk, camera]);
